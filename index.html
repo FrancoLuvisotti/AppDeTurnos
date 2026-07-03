@@ -1,16 +1,15 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Turnos Pro</title>
-    <!-- Tailwind CSS para el diseño -->
+    <title>Gestor de Turnos con Historial de Faltas</title>
+    <!-- Tailwind CSS para diseño moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons para iconos limpios -->
+    <!-- Lucide Icons para iconografía limpia -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Estilo personalizado para el scroll */
+        /* Personalización de scroll */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -29,28 +28,28 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Header Principal -->
-    <header class="bg-indigo-700 text-white shadow-md py-4 px-6 sticky top-0 z-30">
+    <!-- CABECERA PRINCIPAL -->
+    <header class="bg-indigo-800 text-white shadow-md py-4 px-6 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-white/20 p-2 rounded-lg">
-                    <i data-lucide="calendar" class="w-8 h-8 text-white"></i>
+                    <i data-lucide="calendar-range" class="w-8 h-8 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">TurneroPro</h1>
-                    <p class="text-xs text-indigo-200">Agenda de Lunes a Domingo (10:00 a 00:00)</p>
+                    <h1 class="text-2xl font-bold tracking-tight">TurneroPro <span class="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full font-normal">v2.0</span></h1>
+                    <p class="text-xs text-indigo-200 font-medium">Agenda de Lunes a Domingo • Turnos de 16:00 a 00:00 hs</p>
                 </div>
             </div>
             
-            <!-- Controles de Navegación de Semanas -->
-            <div class="flex items-center gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
-                <button onclick="cambiarSemana(-1)" class="p-2 hover:bg-indigo-600 rounded-lg transition-colors" title="Semana Anterior">
+            <!-- Controles para cambiar de semana -->
+            <div class="flex items-center gap-2 bg-indigo-900/60 p-1.5 rounded-xl border border-indigo-600/30">
+                <button onclick="cambiarSemana(-1)" class="p-2 hover:bg-indigo-700 rounded-lg transition-colors" title="Semana Anterior">
                     <i data-lucide="chevron-left" class="w-5 h-5"></i>
                 </button>
                 <span id="labelSemana" class="font-semibold text-sm px-3 min-w-[200px] text-center">
                     Semana en curso
                 </span>
-                <button onclick="cambiarSemana(1)" class="p-2 hover:bg-indigo-600 rounded-lg transition-colors" title="Semana Siguiente">
+                <button onclick="cambiarSemana(1)" class="p-2 hover:bg-indigo-700 rounded-lg transition-colors" title="Semana Siguiente">
                     <i data-lucide="chevron-right" class="w-5 h-5"></i>
                 </button>
                 <button onclick="irSemanaActual()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-medium transition-colors" title="Volver a Hoy">
@@ -60,78 +59,78 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
+    <!-- CUERPO PRINCIPAL -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <!-- PANEL IZQUIERDO: Estadísticas, Leyenda y Acciones Rápidas -->
+        <!-- PANEL LATERAL IZQUIERDO: Estadísticas e Información -->
         <div class="lg:col-span-1 space-y-6">
             
-            <!-- Resumen de Turnos de la Semana -->
+            <!-- Resumen de Turnos de la Semana actual en pantalla -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                 <h3 class="text-md font-bold text-slate-700 mb-4 flex items-center gap-2">
-                    <i data-lucide="trending-up" class="w-5 h-5 text-indigo-500"></i>
-                    Resumen Semanal
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i>
+                    Turnos de la Semana
                 </h3>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-xl">
-                        <div class="text-xs text-yellow-700 font-medium">Sin Seña</div>
-                        <div id="statSinSena" class="text-2xl font-bold text-yellow-600">0</div>
+                        <div class="text-[10px] text-yellow-700 font-bold uppercase tracking-wider">Sin Seña</div>
+                        <div id="statSinSena" class="text-2xl font-black text-yellow-600">0</div>
                     </div>
-                    <div class="bg-green-50 border border-green-200 p-3 rounded-xl">
-                        <div class="text-xs text-green-700 font-medium">Con Seña</div>
-                        <div id="statConSena" class="text-2xl font-bold text-green-600">0</div>
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                        <div class="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Con Seña</div>
+                        <div id="statConSena" class="text-2xl font-black text-emerald-600">0</div>
                     </div>
                     <div class="bg-red-50 border border-red-200 p-3 rounded-xl col-span-2">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-red-700 font-medium">Ausentes (Faltaron)</span>
-                            <span id="statFaltaron" class="text-lg font-bold text-red-600">0</span>
+                            <span class="text-xs text-red-700 font-bold uppercase tracking-wider">Faltaron (Ausentes)</span>
+                            <span id="statFaltaron" class="text-xl font-black text-red-600">0</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Referencia de Colores -->
+            <!-- Leyenda de colores y estados -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                 <h3 class="text-md font-bold text-slate-700 mb-4">Referencia de Estados</h3>
-                <div class="space-y-3 text-sm">
-                    <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500"></div>
+                <div class="space-y-3.5 text-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-500 mt-0.5 shrink-0"></div>
                         <div>
                             <p class="font-semibold text-slate-700">Sin seña ($0)</p>
-                            <p class="text-xs text-slate-500">Se muestra en color amarillo</p>
+                            <p class="text-xs text-slate-500">Pendiente de abono de seña.</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full bg-emerald-500 border border-emerald-600"></div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-4 h-4 rounded-full bg-emerald-500 border border-emerald-600 mt-0.5 shrink-0"></div>
                         <div>
                             <p class="font-semibold text-slate-700">Con seña ($ > 0)</p>
-                            <p class="text-xs text-slate-500">Se muestra en color verde</p>
+                            <p class="text-xs text-slate-500">Seña registrada con éxito.</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full bg-red-500 border border-red-600"></div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-4 h-4 rounded-full bg-red-500 border border-red-600 mt-0.5 shrink-0"></div>
                         <div>
                             <p class="font-semibold text-slate-700">Faltó (Ausente)</p>
-                            <p class="text-xs text-slate-500">Marcado como inasistencia</p>
+                            <p class="text-xs text-slate-500">Inasistencia cargada al historial.</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 pt-2 border-t border-slate-100">
-                        <div class="w-4 h-4 rounded flex items-center justify-center bg-indigo-50 text-indigo-600">
-                            <i data-lucide="pin" class="w-3 h-3"></i>
+                    <div class="flex items-start gap-3 pt-3 border-t border-slate-100">
+                        <div class="w-5 h-5 rounded flex items-center justify-center bg-indigo-50 text-indigo-600 shrink-0">
+                            <i data-lucide="pin" class="w-3.5 h-3.5"></i>
                         </div>
                         <div>
-                            <p class="font-semibold text-slate-700">Turno Fijo</p>
-                            <p class="text-xs text-slate-500">Se repite todas las semanas</p>
+                            <p class="font-semibold text-slate-700 text-xs">Turno Fijo (Recurrente)</p>
+                            <p class="text-[11px] text-slate-500">Se replica automáticamente el mismo día en próximas semanas.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botón Importante / Reiniciar Base de Datos -->
+            <!-- Acciones de Mantenimiento local -->
             <div class="bg-slate-100 p-4 rounded-xl text-center">
-                <p class="text-xs text-slate-500 mb-2">Los datos se guardan de forma local en tu navegador automáticamente.</p>
+                <p class="text-[11px] text-slate-500 mb-2">Los datos y el historial de inasistencias se guardan automáticamente en tu navegador.</p>
                 <button onclick="limpiarTodo()" class="text-xs text-red-600 hover:text-red-800 font-medium transition-colors underline">
-                    Borrar todos los turnos del sistema
+                    Restaurar sistema de fábrica
                 </button>
             </div>
 
@@ -142,59 +141,58 @@
             
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">Grilla Horaria</h2>
-                    <p class="text-sm text-slate-500">Haz clic en cualquier casillero vacío para agendar</p>
+                    <h2 class="text-xl font-bold text-slate-800">Grilla Horaria Activa</h2>
+                    <p class="text-xs text-slate-500">Agenda haciendo clic en casilleros vacíos. El sistema controlará inasistencias automáticamente.</p>
                 </div>
-                <!-- Mini Indicador de Carga/Guardado -->
-                <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded">
-                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-                    Autoguardado Activo
+                <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                    Guardado automático listo
                 </span>
             </div>
 
-            <!-- Grilla Principal (Scroll horizontal en móviles) -->
+            <!-- Grilla Principal con Scroll Horizontal en Móviles -->
             <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                <div class="min-w-[800px]">
+                <div class="min-w-[850px]">
                     
-                    <!-- Encabezados de la Grilla (Días de la semana) -->
-                    <div class="grid grid-cols-8 bg-slate-100 text-slate-700 font-bold text-xs uppercase border-b border-slate-200 py-3 sticky top-0">
-                        <div class="text-center flex items-center justify-center border-r border-slate-200 font-medium text-slate-500">
+                    <!-- Encabezados de Días (Lunes a Domingo) -->
+                    <div class="grid grid-cols-8 bg-slate-150 text-slate-700 font-bold text-xs uppercase border-b border-slate-200 py-3 sticky top-0 z-10">
+                        <div class="text-center flex items-center justify-center border-r border-slate-200 font-bold text-slate-500 bg-slate-100">
                             Horario
                         </div>
                         <!-- Lunes a Domingo -->
                         <div class="text-center border-r border-slate-200 px-1">
-                            <div class="font-bold">Lunes</div>
+                            <div class="font-bold text-slate-700">Lunes</div>
                             <div id="fecha-0" class="text-[10px] text-slate-500 normal-case"></div>
                         </div>
                         <div class="text-center border-r border-slate-200 px-1">
-                            <div class="font-bold">Martes</div>
+                            <div class="font-bold text-slate-700">Martes</div>
                             <div id="fecha-1" class="text-[10px] text-slate-500 normal-case"></div>
                         </div>
                         <div class="text-center border-r border-slate-200 px-1">
-                            <div class="font-bold">Miércoles</div>
+                            <div class="font-bold text-slate-700">Miércoles</div>
                             <div id="fecha-2" class="text-[10px] text-slate-500 normal-case"></div>
                         </div>
                         <div class="text-center border-r border-slate-200 px-1">
-                            <div class="font-bold">Jueves</div>
+                            <div class="font-bold text-slate-700">Jueves</div>
                             <div id="fecha-3" class="text-[10px] text-slate-500 normal-case"></div>
                         </div>
                         <div class="text-center border-r border-slate-200 px-1">
-                            <div class="font-bold">Viernes</div>
+                            <div class="font-bold text-slate-700">Viernes</div>
                             <div id="fecha-4" class="text-[10px] text-slate-500 normal-case"></div>
                         </div>
-                        <div class="text-center border-r border-slate-200 px-1 text-indigo-700">
+                        <div class="text-center border-r border-slate-200 px-1 text-indigo-700 bg-indigo-50/20">
                             <div class="font-bold">Sábado</div>
                             <div id="fecha-5" class="text-[10px] text-indigo-500 normal-case"></div>
                         </div>
-                        <div class="text-center text-red-700 px-1">
+                        <div class="text-center text-rose-700 bg-rose-50/20">
                             <div class="font-bold">Domingo</div>
-                            <div id="fecha-6" class="text-[10px] text-red-500 normal-case"></div>
+                            <div id="fecha-6" class="text-[10px] text-rose-500 normal-case"></div>
                         </div>
                     </div>
 
-                    <!-- Filas de Horas de 10:00 a 00:00 -->
+                    <!-- Filas Horarias (16:00 a 00:00) -->
                     <div id="contenedorFilas" class="divide-y divide-slate-100">
-                        <!-- Se genera dinámicamente con JS -->
+                        <!-- Se generará con JS -->
                     </div>
 
                 </div>
@@ -206,45 +204,52 @@
 
     <!-- MODAL 1: Formulario para Agendar / Editar Turno -->
     <div id="modalTurno" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <!-- Cabecera del modal -->
-            <div class="bg-indigo-700 text-white p-5">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-150 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <!-- Header -->
+            <div class="bg-indigo-850 text-white p-5">
                 <div class="flex justify-between items-center">
                     <h3 id="modalTitulo" class="text-lg font-bold">Agendar Nuevo Turno</h3>
                     <button onclick="cerrarModalTurno()" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
-                <p id="modalSubtitulo" class="text-xs text-indigo-150 mt-1">Lunes 10:00 AM</p>
+                <p id="modalSubtitulo" class="text-xs text-indigo-200 mt-1">Lunes 16:00 hs</p>
             </div>
 
-            <!-- Cuerpo del formulario -->
+            <!-- Formulario -->
             <form id="formTurno" onsubmit="guardarTurno(event)" class="p-6 space-y-4">
-                <!-- Inputs ocultos para ubicar el turno temporalmente -->
                 <input type="hidden" id="inputDia">
                 <input type="hidden" id="inputHora">
-                <input type="hidden" id="inputTurnoId"> <!-- Vacío si es nuevo, contiene ID si edita -->
+                <input type="hidden" id="inputTurnoId">
 
+                <!-- Campo Teléfono de contacto (Se usa como ID principal para el historial de faltas) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono de Contacto (Único) *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i data-lucide="phone" class="w-4 h-4"></i>
+                        </span>
+                        <input type="tel" id="inputTelefono" required oninput="actualizarAlertaHistorial()" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold" placeholder="Ej: 1123456789 (Sin guiones)">
+                    </div>
+                </div>
+
+                <!-- Campo Nombre del Cliente -->
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre del Cliente *</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                             <i data-lucide="user" class="w-4 h-4"></i>
                         </span>
-                        <input type="text" id="inputNombre" required class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm" placeholder="Ej. Juan Pérez">
+                        <input type="text" id="inputNombre" required oninput="actualizarAlertaHistorial()" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm" placeholder="Ej: Juan Pérez">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono de Contacto *</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <i data-lucide="phone" class="w-4 h-4"></i>
-                        </span>
-                        <input type="tel" id="inputTelefono" required class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm" placeholder="Ej. 1123456789">
-                    </div>
+                <!-- ALERTA DE INASISTENCIA (DINÁMICA) -->
+                <div id="alertaInasistencia" class="hidden">
+                    <!-- Se llena con JS si el cliente ya faltó previamente -->
                 </div>
 
+                <!-- Seña y Fijo -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Seña ($ Pesos)</label>
@@ -256,7 +261,7 @@
                         </div>
                     </div>
 
-                    <!-- Switch Fijo -->
+                    <!-- Interruptor de Turno Fijo -->
                     <div class="flex flex-col justify-end">
                         <label class="flex items-center gap-2 cursor-pointer py-2.5">
                             <input type="checkbox" id="inputFijo" class="sr-only peer">
@@ -266,15 +271,13 @@
                     </div>
                 </div>
 
-                <!-- Alerta/Explicación sobre Turnos Fijos -->
                 <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 text-[11px] text-indigo-700 flex gap-2 items-start">
                     <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
-                    <span>Los turnos fijos se reservarán automáticamente el mismo día y hora para todas las próximas semanas.</span>
+                    <span>Los turnos fijos aseguran el mismo día y hora para todas las próximas semanas.</span>
                 </div>
 
-                <!-- Botones de Acción -->
+                <!-- Botones del Formulario -->
                 <div class="flex gap-2 pt-4 border-t border-slate-100 justify-between">
-                    <!-- Botón Eliminar (Sólo visible en edición) -->
                     <button type="button" id="btnEliminar" onclick="eliminarTurnoActual()" class="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold transition-colors hidden">
                         Eliminar
                     </button>
@@ -283,7 +286,7 @@
                         <button type="button" onclick="cerrarModalTurno()" class="flex-1 md:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
                             Cancelar
                         </button>
-                        <button type="submit" class="flex-1 md:flex-none px-5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm">
+                        <button type="submit" class="flex-1 md:flex-none px-5 py-2 bg-indigo-800 hover:bg-indigo-950 text-white rounded-xl text-xs font-bold transition-colors shadow-sm">
                             Guardar Turno
                         </button>
                     </div>
@@ -292,9 +295,9 @@
         </div>
     </div>
 
-    <!-- MODAL 2: Acciones Extendidas (Faltó, Reagendar, etc.) -->
+    <!-- MODAL 2: Acciones Extendidas (Faltó, Reagendar, Estadísticas del cliente) -->
     <div id="modalOpciones" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-150 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <!-- Header -->
             <div id="opcionesHeader" class="p-5 text-white">
                 <div class="flex justify-between items-center">
@@ -303,27 +306,39 @@
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
-                <p id="opcionesCliente" class="text-sm font-semibold mt-1">Juan Pérez</p>
-                <p id="opcionesHorario" class="text-xs text-indigo-150 mt-0.5">Sábado a las 14:00</p>
+                <p id="opcionesCliente" class="text-sm font-semibold mt-1">Nombre</p>
+                <p id="opcionesHorario" class="text-xs text-indigo-150 mt-0.5">Día y Hora</p>
             </div>
 
             <!-- Cuerpo de opciones -->
-            <div class="p-6 space-y-5">
+            <div class="p-6 space-y-4">
                 
-                <!-- Datos Rápidos del Turno -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm space-y-1">
-                    <p class="flex justify-between">
-                        <span class="text-slate-500 font-medium">Teléfono:</span>
-                        <span id="txtInfoTelefono" class="font-semibold text-slate-800">11223344</span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span class="text-slate-500 font-medium">Seña pagada:</span>
-                        <span id="txtInfoSena" class="font-semibold text-slate-800">$ 2,000</span>
-                    </p>
-                    <p class="flex justify-between">
-                        <span class="text-slate-500 font-medium">Tipo:</span>
-                        <span id="txtInfoFijo" class="font-semibold text-indigo-600">Común (Solo esta semana)</span>
-                    </p>
+                <!-- Historial histórico de este Cliente específico -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="users-round" class="w-4 h-4 text-slate-500"></i>
+                        Historial del Cliente
+                    </h4>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="bg-emerald-50 border border-emerald-100 p-2 rounded-lg">
+                            <span class="text-[10px] text-emerald-700 block font-bold uppercase">Jugó (Asistió)</span>
+                            <span id="historialJugo" class="text-lg font-black text-emerald-700">0 veces</span>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-100 p-2 rounded-lg">
+                            <span class="text-[10px] text-rose-700 block font-bold uppercase">Faltó (Ausente)</span>
+                            <span id="historialFalto" class="text-lg font-black text-rose-700">0 veces</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2.5 text-xs text-slate-500 flex justify-between px-1">
+                        <span>Teléfono registrado:</span>
+                        <span id="txtInfoTelefono" class="font-semibold text-slate-700">112233</span>
+                    </div>
+                    <div class="text-xs text-slate-500 flex justify-between px-1 mt-1">
+                        <span>Seña de este turno:</span>
+                        <span id="txtInfoSena" class="font-bold text-slate-800">$0</span>
+                    </div>
                 </div>
 
                 <!-- Botones de Acción Críticos -->
@@ -332,22 +347,22 @@
                     <!-- Botón Marcar Falta (Rojo) -->
                     <button id="btnMarcarFalta" onclick="toggleFalta()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border font-bold text-xs transition-all">
                         <i data-lucide="user-x" class="w-4 h-4"></i>
-                        <span>Marcar Falta / Ausente</span>
+                        <span>Inasistencia / Faltó</span>
                     </button>
 
-                    <!-- Botón Editar Directamente -->
+                    <!-- Botón Editar Detalles Directamente -->
                     <button onclick="abrirEditarDesdeOpciones()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-xs transition-all">
                         <i data-lucide="edit-3" class="w-4 h-4"></i>
-                        Editar Detalles / Seña
+                        Editar Detalles
                     </button>
 
                 </div>
 
                 <!-- Sección: Reagendar / Pasar a otra semana -->
                 <div class="border-t border-slate-200 pt-4">
-                    <h4 class="text-xs font-bold text-slate-600 uppercase mb-3 flex items-center gap-1">
+                    <h4 class="text-xs font-bold text-slate-600 uppercase mb-3 flex items-center gap-1.5">
                         <i data-lucide="arrow-right-left" class="w-4 h-4 text-indigo-500"></i>
-                        Reagendar / Mover Turno
+                        Mover turno a otra semana
                     </h4>
                     
                     <div class="space-y-3">
@@ -355,7 +370,7 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Semana Destino</label>
                                 <select id="selectReagendaSemana" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-1 focus:ring-indigo-500 outline-none">
-                                    <!-- Opciones generadas por JS dinámicamente -->
+                                    <!-- Generado dinámicamente -->
                                 </select>
                             </div>
                             <div>
@@ -373,23 +388,23 @@
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hora Destino</label>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Hora Destino (16:00 a 00:00)</label>
                             <select id="selectReagendaHora" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium focus:ring-1 focus:ring-indigo-500 outline-none">
-                                <!-- Horarios de 10 a 00 -->
+                                <!-- Horarios de 16:00 a 00:00 -->
                             </select>
                         </div>
 
-                        <button onclick="confirmarReagenda()" class="w-full py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl font-bold text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
+                        <button onclick="confirmarReagenda()" class="w-full py-2.5 bg-indigo-800 hover:bg-indigo-900 text-white rounded-xl font-bold text-xs transition-colors shadow-sm flex items-center justify-center gap-1.5">
                             <i data-lucide="check" class="w-4 h-4"></i>
-                            Confirmar Nueva Fecha y Hora
+                            Reubicar en la fecha elegida
                         </button>
                     </div>
                 </div>
 
-                <!-- Botones Inferiores -->
+                <!-- Botones de salida e Inhabilitación -->
                 <div class="flex justify-between items-center pt-3 border-t border-slate-100">
                     <button onclick="eliminarDesdeOpciones()" class="text-rose-600 hover:text-rose-800 text-xs font-bold underline transition-colors">
-                        Eliminar turno definitivamente
+                        Eliminar definitivamente
                     </button>
                     <button onclick="cerrarModalOpciones()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all">
                         Cerrar
@@ -400,49 +415,35 @@
         </div>
     </div>
 
-    <!-- Notificación / Toast personalizado flotante -->
+    <!-- TOAST FLOTANTE DE RETROALIMENTACIÓN -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
         <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
-        <span id="toastMsg">¡Acción realizada con éxito!</span>
+        <span id="toastMsg">¡Acción exitosa!</span>
     </div>
 
-    <!-- LOGICA DE LA APLICACIÓN -->
+    <!-- LOGICA JAVASCRIPT DE LA APLICACIÓN -->
     <script>
-        // CONFIGURACIONES BÁSICAS
-        const HORARIO_INICIO = 10; // 10:00 AM
-        const HORARIO_FIN = 24;    // 0:00 AM (Medianoche representada como 24)
-        
-        // Estructura de Datos de Turnos:
-        // {
-        //   id: "string_unico",
-        //   nombre: "Juan",
-        //   telefono: "123",
-        //   sena: 500,
-        //   fijo: false/true,
-        //   falto: false/true,
-        //   dia: 0..6 (Lunes a Domingo),
-        //   hora: "10:00", (o "10:30")
-        //   fechaSemanaRef: "YYYY-MM-DD" (Fecha del lunes de la semana correspondiente)
-        // }
+        // CONFIGURACIONES BÁSICAS DE OPERACIÓN (16:00 a 00:00)
+        const HORARIO_INICIO = 16; 
+        const HORARIO_FIN = 24;    
+
+        // Estructura de Datos de Turnos
         let turnos = [];
 
-        // Estado de la Vista
-        let fechaLunesActual = obtenerLunesDeSemana(new Date()); // Fecha lunes semana visualizada
-        let idTurnoSeleccionado = null; // Para control de modals
+        // Estado inicial
+        let fechaLunesActual = obtenerLunesDeSemana(new Date()); 
+        let idTurnoSeleccionado = null; 
 
-        // Inicializar al cargar el DOM
         document.addEventListener("DOMContentLoaded", () => {
             cargarDatos();
             generarControlesReagenda();
             renderizarGrilla();
             actualizarEstadisticas();
             actualizarLabelSemana();
-            
-            // Render de iconos de Lucide
             lucide.createIcons();
         });
 
-        // OBTENER LA FECHA DEL LUNES DE LA SEMANA DE UN OBJETO FECHA DADO
+        // OBTENER FECHA DEL LUNES DE LA SEMANA DE UN OBJETO FECHA DADO
         function obtenerLunesDeSemana(d) {
             const date = new Date(d);
             const day = date.getDay();
@@ -453,16 +454,13 @@
             return lunes;
         }
 
-        // Formatear fechas para encabezados
         function formatearDiaMes(fecha) {
-            const d = fecha.getDate();
-            const m = fecha.getMonth() + 1; // Enero es 0
-            return `${d}/${m}`;
+            return `${fecha.getDate()}/${fecha.getMonth() + 1}`;
         }
 
-        // Cargar datos de LocalStorage
+        // Cargar desde LocalStorage
         function cargarDatos() {
-            const guardado = localStorage.getItem("turnero_datos_v1");
+            const guardado = localStorage.getItem("turnero_datos_v2");
             if (guardado) {
                 try {
                     turnos = JSON.parse(guardado);
@@ -470,53 +468,53 @@
                     turnos = [];
                 }
             } else {
-                // Mock de demostración inicial
+                // Mock o datos demo para pruebas iniciales en la semana actual
                 const hoy = obtenerLunesDeSemana(new Date());
                 const ref = formatearFechaID(hoy);
                 
                 turnos = [
                     {
-                        id: "demo-1",
+                        id: "demo-v2-1",
                         nombre: "Marta Gómez",
-                        telefono: "+54 9 223 543-2101",
-                        sena: 0, // Sin seña (Amarillo)
+                        telefono: "1123456789",
+                        sena: 0, 
                         fijo: false,
                         falto: false,
                         dia: 0, // Lunes
-                        hora: "10:00",
+                        hora: "16:00",
                         fechaSemanaRef: ref
                     },
                     {
-                        id: "demo-2",
-                        nombre: "Carlos Tevez",
-                        telefono: "11-6677-8899",
-                        sena: 1500, // Con seña (Verde)
+                        id: "demo-v2-2",
+                        nombre: "Carlos Pérez",
+                        telefono: "1198765432",
+                        sena: 2000, 
                         fijo: false,
                         falto: false,
                         dia: 1, // Martes
-                        hora: "14:30",
+                        hora: "18:30",
                         fechaSemanaRef: ref
                     },
                     {
-                        id: "demo-3",
-                        nombre: "Sofía Luna (Fijo)",
-                        telefono: "223-998877",
-                        sena: 2000,
-                        fijo: true, // Fijo
-                        falto: false,
-                        dia: 2, // Miércoles
-                        hora: "18:00",
-                        fechaSemanaRef: ref
-                    },
-                    {
-                        id: "demo-4",
-                        nombre: "Roberto Carlos",
-                        telefono: "154-112233",
-                        sena: 500,
+                        id: "demo-v2-3",
+                        nombre: "Carlos Pérez",
+                        telefono: "1198765432",
+                        sena: 0, 
                         fijo: false,
-                        falto: true, // Faltó (Rojo)
-                        dia: 4, // Viernes
+                        falto: true, // Ya faltó una vez para demostrar historial
+                        dia: 2, // Miércoles
                         hora: "20:00",
+                        fechaSemanaRef: ref
+                    },
+                    {
+                        id: "demo-v2-4",
+                        nombre: "Sofía Luna",
+                        telefono: "1144556677",
+                        sena: 1500,
+                        fijo: true, 
+                        falto: false,
+                        dia: 4, // Viernes
+                        hora: "22:00",
                         fechaSemanaRef: ref
                     }
                 ];
@@ -525,10 +523,9 @@
         }
 
         function guardarDatos() {
-            localStorage.setItem("turnero_datos_v1", JSON.stringify(turnos));
+            localStorage.setItem("turnero_datos_v2", JSON.stringify(turnos));
         }
 
-        // Formatear un objeto Date a string tipo "YYYY-MM-DD"
         function formatearFechaID(fechaObj) {
             const yyyy = fechaObj.getFullYear();
             const mm = String(fechaObj.getMonth() + 1).padStart(2, '0');
@@ -536,9 +533,8 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // CONTROL DE NAVEGACIÓN SEMANAL
+        // CONTROL DE NAVEGACIÓN
         function cambiarSemana(direccion) {
-            // Sumar o restar 7 días
             fechaLunesActual.setDate(fechaLunesActual.getDate() + (direccion * 7));
             actualizarLabelSemana();
             renderizarGrilla();
@@ -550,7 +546,7 @@
             actualizarLabelSemana();
             renderizarGrilla();
             actualizarEstadisticas();
-            showToast("Volviendo a la semana actual");
+            showToast("Volviendo a la semana en curso");
         }
 
         function actualizarLabelSemana() {
@@ -563,7 +559,7 @@
             
             document.getElementById("labelSemana").textContent = `${txtInicio} - ${txtFin} (${fechaLunesActual.getFullYear()})`;
 
-            // Actualizar fechas de cabecera de la grilla
+            // Fechas en la cabecera
             for (let i = 0; i < 7; i++) {
                 const tempDate = new Date(fechaLunesActual);
                 tempDate.setDate(tempDate.getDate() + i);
@@ -571,13 +567,12 @@
             }
         }
 
-        // GENERACIÓN DE CONTROLES EN SELECTS DE REAGENDA
+        // GENERACIÓN DE CONTROLES SELECTS
         function generarControlesReagenda() {
-            // Cargar horas
+            // Cargar horas de 16 a 00
             const selectHora = document.getElementById("selectReagendaHora");
             selectHora.innerHTML = "";
             for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
-                // Intervalos de 30 minutos
                 const hStr = String(h).padStart(2, '0');
                 
                 const opt1 = document.createElement("option");
@@ -591,7 +586,7 @@
                 selectHora.appendChild(opt2);
             }
 
-            // Cargar semanas próximas (hoy + 8 semanas)
+            // Semanas Próximas (8 semanas de opción)
             const selectSemana = document.getElementById("selectReagendaSemana");
             selectSemana.innerHTML = "";
             const lunesRef = obtenerLunesDeSemana(new Date());
@@ -603,9 +598,6 @@
                 const opt = document.createElement("option");
                 opt.value = formatearFechaID(tempLunes);
                 
-                const finS = new Date(tempLunes);
-                finS.setDate(finS.getDate() + 6);
-                
                 let etiqueta = `Semana del ${tempLunes.getDate()}/${tempLunes.getMonth()+1}`;
                 if (s === 0) etiqueta += " (Esta semana)";
                 else if (s === 1) etiqueta += " (Prox. semana)";
@@ -615,11 +607,42 @@
             }
         }
 
-        // BUSCAR TURNO ESPECÍFICO EN UN DÍA, HORA Y SEMANA
-        // Nota importante: Si es FIJO, se muestra en TODAS las semanas a menos que
-        // haya un turno específico de esa semana que lo sobreescriba.
+        // CALCULAR EL HISTORIAL DE UN CLIENTE (Nombre o Teléfono)
+        // Retorna cuántas veces tiene 'falto = true' y cuántas asistió (turnos no faltados)
+        function calcularHistorialCliente(telefono, nombre) {
+            let jugo = 0;
+            let falto = 0;
+
+            const telLimpio = String(telefono || "").replace(/\D/g, '').trim();
+            const nomLimpio = String(nombre || "").toLowerCase().trim();
+
+            if (!telLimpio && !nomLimpio) {
+                return { jugo, falto };
+            }
+
+            turnos.forEach(t => {
+                const tTelLimpio = String(t.telefono || "").replace(/\D/g, '').trim();
+                const tNomLimpio = String(t.nombre || "").toLowerCase().trim();
+
+                // Intentar emparejar por teléfono exacto (si existe), o por nombre coincidente
+                const coincideTelefono = (telLimpio && tTelLimpio && telLimpio === tTelLimpio);
+                const coincideNombre = (nomLimpio && tNomLimpio && nomLimpio === tNomLimpio);
+
+                if (coincideTelefono || coincideNombre) {
+                    if (t.falto) {
+                        falto++;
+                    } else {
+                        jugo++;
+                    }
+                }
+            });
+
+            return { jugo, falto };
+        }
+
+        // BUSCAR TURNO ESPECÍFICO / FIJO REPLICADO
         function obtenerTurnoEn(dia, hora, fechaSemanaRef) {
-            // 1. Buscar si hay un turno específico agendado para esta semana específica en este horario
+            // 1. Turno específico agendado para esta semana
             const turnoEspecifico = turnos.find(t => 
                 t.dia === dia && 
                 t.hora === hora && 
@@ -630,8 +653,7 @@
                 return turnoEspecifico;
             }
 
-            // 2. Si no hay específico, buscar si hay un turno FIJO configurado en ese día y hora.
-            // Para evitar conflictos, el turno fijo debe haberse creado en una fecha igual o anterior.
+            // 2. Turno Fijo replicado
             const turnoFijo = turnos.find(t => 
                 t.dia === dia && 
                 t.hora === hora && 
@@ -639,38 +661,33 @@
             );
 
             if (turnoFijo) {
-                // Devolvemos el turno fijo. Nota: se mostrará replicado en esta semana.
                 return {
                     ...turnoFijo,
-                    replicaFijo: true, // Flag para saber que es heredado
-                    fechaSemanaRefActual: fechaSemanaRef // Apunta a la semana actual visualizada
+                    replicaFijo: true,
+                    fechaSemanaRefActual: fechaSemanaRef
                 };
             }
 
             return null;
         }
 
-        // RENDERIZAR LA GRILLA DE TURNOS
+        // RENDERIZAR GRILLA HORARIA
         function renderizarGrilla() {
             const contenedor = document.getElementById("contenedorFilas");
             contenedor.innerHTML = "";
             const semanaId = formatearFechaID(fechaLunesActual);
 
-            // Bucle por cada hora
             for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
                 const hStr = String(h).padStart(2, '0');
-                
-                // Renderizamos fila para XX:00 y XX:30
                 const bloques = ["00", "30"];
                 
                 bloques.forEach(bloque => {
                     const horaFormateada = `${hStr}:${bloque}`;
                     
-                    // Contenedor de la Fila
                     const fila = document.createElement("div");
-                    fila.className = "grid grid-cols-8 hover:bg-slate-50/70 transition-colors border-b border-slate-100 min-h-[52px]";
+                    fila.className = "grid grid-cols-8 hover:bg-slate-50/70 transition-colors border-b border-slate-100 min-h-[56px]";
                     
-                    // Celda de Hora
+                    // Columna del horario
                     const celdaHora = document.createElement("div");
                     celdaHora.className = "text-center py-3 border-r border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center font-bold text-xs text-slate-500 sticky left-0 z-10";
                     celdaHora.innerHTML = `
@@ -679,7 +696,7 @@
                     `;
                     fila.appendChild(celdaHora);
 
-                    // 7 celdas para los días de Lunes a Domingo
+                    // 7 columnas (Días)
                     for (let dia = 0; dia < 7; dia++) {
                         const celdaDia = document.createElement("div");
                         celdaDia.className = "border-r border-slate-200 p-1 flex flex-col justify-stretch relative group cursor-pointer transition-colors";
@@ -687,11 +704,11 @@
                         const turno = obtenerTurnoEn(dia, horaFormateada, semanaId);
 
                         if (turno) {
-                            // Definir colores según regla de negocio
-                            // - Si faltó: color Rojo
-                            // - Si no tiene seña (sena === 0): color Amarillo
-                            // - Si tiene seña (> 0): color Verde
-                            let bgClass = "bg-yellow-100 hover:bg-yellow-200 text-yellow-900 border-yellow-300"; // Default sin seña
+                            // Obtener historial del cliente para renderizar
+                            const hist = calcularHistorialCliente(turno.telefono, turno.nombre);
+
+                            // Colores de estado
+                            let bgClass = "bg-yellow-100 hover:bg-yellow-200 text-yellow-900 border-yellow-300"; 
                             let badgeClass = "bg-yellow-200 text-yellow-800";
                             
                             if (turno.falto) {
@@ -702,43 +719,49 @@
                                 badgeClass = "bg-emerald-200 text-emerald-800";
                             }
 
-                            celdaDia.className += ` ${bgClass} border rounded-lg shadow-sm m-1 transition-all overflow-hidden relative`;
+                            celdaDia.className += ` ${bgClass} border rounded-lg shadow-xs m-1 transition-all overflow-hidden relative`;
                             
-                            // Botón especial para interactuar / abrir opciones
                             celdaDia.onclick = (e) => {
                                 e.stopPropagation();
                                 abrirOpcionesTurno(turno);
                             };
 
-                            // Contenido del turno agendado
                             celdaDia.innerHTML = `
                                 <div class="flex flex-col justify-between h-full text-[11px] leading-tight p-1.5">
                                     <div class="font-bold flex items-center justify-between gap-1">
-                                        <span class="truncate block max-w-[85%]">${turno.nombre}</span>
-                                        ${turno.fijo ? `<i data-lucide="pin" class="w-3 h-3 text-indigo-600 shrink-0" title="Turno Fijo"></i>` : ''}
+                                        <span class="truncate block max-w-[80%]">${turno.nombre}</span>
+                                        ${turno.fijo ? `<i data-lucide="pin" class="w-3 h-3 text-indigo-700 shrink-0" title="Turno Fijo"></i>` : ''}
                                     </div>
                                     
-                                    <div class="text-[10px] text-slate-600 truncate flex items-center gap-1 mt-0.5">
-                                        <i data-lucide="phone" class="w-2.5 h-2.5 opacity-70"></i>
+                                    <!-- Teléfono -->
+                                    <div class="text-[9px] text-slate-600 truncate flex items-center gap-1 mt-0.5">
+                                        <i data-lucide="phone" class="w-2.5 h-2.5 opacity-75"></i>
                                         <span>${turno.telefono}</span>
                                     </div>
 
-                                    <div class="mt-1 flex items-center justify-between gap-1 pt-1 border-t border-black/5">
+                                    <!-- DESCRIPCIÓN REQUERIDA: Cantidad de veces que jugó y cuántas faltó -->
+                                    <div class="text-[9px] bg-white/40 rounded px-1 py-0.5 mt-1 border border-black/5 flex items-center justify-between text-slate-700">
+                                        <span class="font-semibold">Jugó: ${hist.jugo}</span>
+                                        <span class="font-semibold text-rose-700">Faltó: ${hist.falto}</span>
+                                    </div>
+
+                                    <!-- Separador y Estado/Seña -->
+                                    <div class="mt-1.5 flex items-center justify-between gap-1 pt-1 border-t border-black/5">
                                         <span class="font-bold text-[10px] text-slate-800">
                                             $${turno.sena.toLocaleString('es-AR')}
                                         </span>
-                                        <span class="text-[9px] px-1 py-0.5 rounded font-bold ${badgeClass}">
-                                            ${turno.falto ? 'FALTÓ' : (turno.sena > 0 ? 'SEÑA OK' : 'S/SEÑA')}
+                                        <span class="text-[8px] px-1 py-0.5 rounded font-bold uppercase tracking-wide ${badgeClass}">
+                                            ${turno.falto ? 'FALTÓ' : (turno.sena > 0 ? 'CON SEÑA' : 'SIN SEÑA')}
                                         </span>
                                     </div>
                                 </div>
                             `;
                         } else {
-                            // Celda vacía (Se puede agendar)
+                            // Vacío
                             celdaDia.className += " hover:bg-indigo-50/50";
                             celdaDia.innerHTML = `
-                                <div class="w-full h-full min-h-[40px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="bg-indigo-600 text-white rounded-full p-1 shadow-md">
+                                <div class="w-full h-full min-h-[42px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="bg-indigo-700 text-white rounded-full p-1 shadow-md">
                                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                                     </span>
                                 </div>
@@ -755,20 +778,16 @@
                 });
             }
             
-            // Re-renderizar iconos dinámicos
             lucide.createIcons();
         }
 
-        // ACTUALIZAR ESTADISTICAS DEL PANEL IZQUIERDO
+        // ACTUALIZAR ESTADÍSTICAS EN PANEL LATERAL
         function actualizarEstadisticas() {
             const semanaId = formatearFechaID(fechaLunesActual);
-            
-            // Contamos los turnos visibles en la semana actual (incluidos los fijos)
             let sinSena = 0;
             let conSena = 0;
             let faltaron = 0;
 
-            // Recorremos todos los horarios de la grilla para la semana actual
             for (let dia = 0; dia < 7; dia++) {
                 for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
                     const hStr = String(h).padStart(2, '0');
@@ -796,38 +815,61 @@
             document.getElementById("statFaltaron").textContent = faltaron;
         }
 
-        // MODAL 1: ABRIR PARA AGENDAR NUEVO
+        // ALERTA DINÁMICA DE INASISTENCIA (AL EDITAR INPUTS DEL FORMULARIO)
+        function actualizarAlertaHistorial() {
+            const tel = document.getElementById("inputTelefono").value;
+            const nom = document.getElementById("inputNombre").value;
+            const alertaBox = document.getElementById("alertaInasistencia");
+
+            const hist = calcularHistorialCliente(tel, nom);
+
+            if (hist.falto > 0) {
+                alertaBox.className = "bg-rose-50 border border-rose-200 p-3 rounded-xl text-rose-800 space-y-1 block animate-pulse";
+                alertaBox.innerHTML = `
+                    <div class="flex items-center gap-2 font-bold text-xs">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600 shrink-0"></i>
+                        <span>¡ATENCIÓN! CLIENTE DE RIESGO</span>
+                    </div>
+                    <p class="text-[11px] leading-snug">
+                        Este número/nombre ya registra <strong>${hist.falto} falta(s)</strong> en el sistema de turnos. 
+                        Se recomienda solicitar seña completa por adelantado.
+                    </p>
+                `;
+                lucide.createIcons();
+            } else {
+                alertaBox.className = "hidden";
+                alertaBox.innerHTML = "";
+            }
+        }
+
+        // MODAL 1: ABRIR REGISTRO NUEVO
         function abrirAgendarNuevo(dia, hora) {
-            idTurnoSeleccionado = null; // Indica que es un nuevo turno
+            idTurnoSeleccionado = null; 
             document.getElementById("inputTurnoId").value = "";
             document.getElementById("inputDia").value = dia;
             document.getElementById("inputHora").value = hora;
             
-            // Textos del header
             const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-            document.getElementById("modalTitulo").textContent = "Agendar Nuevo Turno";
+            document.getElementById("modalTitulo").textContent = "Agendar Turno";
             document.getElementById("modalSubtitulo").textContent = `${nombresDias[dia]} a las ${hora} hs`;
 
-            // Reset campos
+            // Reset
             document.getElementById("inputNombre").value = "";
             document.getElementById("inputTelefono").value = "";
             document.getElementById("inputSena").value = 0;
             document.getElementById("inputFijo").checked = false;
+            document.getElementById("alertaInasistencia").className = "hidden";
 
-            // Ocultar botón eliminar
             document.getElementById("btnEliminar").classList.add("hidden");
-
-            // Mostrar Modal
             document.getElementById("modalTurno").classList.remove("hidden");
         }
 
-        // MODAL 1: CERRAR
         function cerrarModalTurno() {
             document.getElementById("modalTurno").classList.add("hidden");
             idTurnoSeleccionado = null;
         }
 
-        // MODAL 1: GUARDAR FORMULARIO
+        // GUARDAR FORMULARIO
         function guardarTurno(e) {
             e.preventDefault();
 
@@ -841,31 +883,30 @@
             const semanaId = formatearFechaID(fechaLunesActual);
 
             if (!nombre || !telefono) {
-                showToast("Por favor complete los campos obligatorios");
+                showToast("Completa los datos obligatorios.");
                 return;
             }
 
             if (id) {
-                // EDITANDO EXISTENTE
+                // EDITAR EXISTENTE
                 const index = turnos.findIndex(t => t.id === id);
                 if (index !== -1) {
                     turnos[index].nombre = nombre;
                     turnos[index].telefono = telefono;
                     turnos[index].sena = sena;
                     turnos[index].fijo = fijo;
-                    // Mantiene día, hora y semana del original
-                    showToast("Turno actualizado correctamente");
+                    showToast("Turno editado exitosamente");
                 }
             } else {
-                // NUEVO TURNO
-                // Validar que no se superponga con otro existente específico
+                // NUEVO REGISTRO
+                // Verificar colisión exacta
                 const duplicado = turnos.some(t => t.dia === dia && t.hora === hora && t.fechaSemanaRef === semanaId);
                 if (duplicado) {
-                    showToast("Ya existe un turno específico en este horario.");
+                    showToast("Este casillero ya está reservado específicamente para esta semana.");
                     return;
                 }
 
-                const nuevoTurno = {
+                const nuevo = {
                     id: 'turno-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
                     nombre,
                     telefono,
@@ -877,8 +918,8 @@
                     fechaSemanaRef: semanaId
                 };
 
-                turnos.push(nuevoTurno);
-                showToast("¡Turno agendado con éxito!");
+                turnos.push(nuevo);
+                showToast("¡Turno registrado!");
             }
 
             guardarDatos();
@@ -891,22 +932,22 @@
         function eliminarTurnoActual() {
             const id = document.getElementById("inputTurnoId").value;
             if (id) {
-                if (confirm("¿Estás seguro de que deseas eliminar este turno?")) {
+                if (confirm("¿Seguro que deseas remover este turno?")) {
                     turnos = turnos.filter(t => t.id !== id);
                     guardarDatos();
                     cerrarModalTurno();
                     renderizarGrilla();
                     actualizarEstadisticas();
-                    showToast("Turno eliminado");
+                    showToast("Turno borrado.");
                 }
             }
         }
 
-        // MODAL 2: GESTIONAR ACCIONES EXTENDIDAS
+        // MODAL 2: ABRIR ACCIONES EXTENDIDAS
         function abrirOpcionesTurno(turno) {
             idTurnoSeleccionado = turno.id;
             
-            // Cabecera color dinámico según estado
+            // Header Color según Estado
             const header = document.getElementById("opcionesHeader");
             header.className = "p-5 text-white transition-colors duration-200 ";
             
@@ -918,35 +959,37 @@
                 header.className += "bg-yellow-500 text-slate-900";
             }
 
-            // Textos descriptivos
             const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
             document.getElementById("opcionesTitulo").textContent = turno.fijo ? "Gestionar Turno Fijo" : "Gestionar Turno";
             document.getElementById("opcionesCliente").textContent = turno.nombre;
             document.getElementById("opcionesHorario").textContent = `${nombresDias[turno.dia]} a las ${turno.hora} hs`;
 
-            // Cargar info rápida
+            // Calcular historial completo
+            const hist = calcularHistorialCliente(turno.telefono, turno.nombre);
+            document.getElementById("historialJugo").textContent = `${hist.jugo} vez/veces`;
+            document.getElementById("historialFalto").textContent = `${hist.falto} vez/veces`;
+
+            // Info de contacto
             document.getElementById("txtInfoTelefono").textContent = turno.telefono;
             document.getElementById("txtInfoSena").textContent = `$ ${turno.sena.toLocaleString('es-AR')}`;
-            document.getElementById("txtInfoFijo").textContent = turno.fijo ? "Fijo (Repite todas las semanas)" : "Solo esta semana";
+            document.getElementById("txtInfoFijo").textContent = turno.fijo ? "Fijo (Se replica todas las semanas)" : "Solo esta semana";
             document.getElementById("txtInfoFijo").className = turno.fijo ? "font-bold text-indigo-600" : "font-semibold text-slate-500";
 
-            // Botón de falta (Estilo según estado de falta)
+            // Botón de falta
             const btnFalta = document.getElementById("btnMarcarFalta");
             if (turno.falto) {
                 btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all";
-                btnFalta.innerHTML = `<i data-lucide="user-check" class="w-4 h-4"></i> Quitar Falta`;
+                btnFalta.innerHTML = `<i data-lucide="user-check" class="w-4 h-4"></i> Quitar Inasistencia`;
             } else {
                 btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 hover:text-rose-700 font-bold text-xs transition-all";
-                btnFalta.innerHTML = `<i data-lucide="user-x" class="w-4 h-4"></i> Faltó al turno`;
+                btnFalta.innerHTML = `<i data-lucide="user-x" class="w-4 h-4"></i> Inasistencia / Faltó`;
             }
 
-            // Valores de Reagenda por defecto (limitar al actual por si quiere cambiar algo menor)
-            // Configuramos selectores para que coincidan con el turno seleccionado
+            // Valores de Reagenda por defecto
             document.getElementById("selectReagendaDia").value = turno.dia;
             document.getElementById("selectReagendaHora").value = turno.hora;
             document.getElementById("selectReagendaSemana").value = turno.replicaFijo ? turno.fechaSemanaRefActual : turno.fechaSemanaRef;
 
-            // Mostrar el modal
             document.getElementById("modalOpciones").classList.remove("hidden");
             lucide.createIcons();
         }
@@ -956,24 +999,21 @@
             idTurnoSeleccionado = null;
         }
 
-        // ACCIÓN: MARCAR / QUITAR INASISTENCIA (ROJO)
+        // ACCIÓN: MARCAR FALTA (ROJO)
         function toggleFalta() {
             if (!idTurnoSeleccionado) return;
             
-            // Buscamos el turno seleccionado
             const index = turnos.findIndex(t => t.id === idTurnoSeleccionado);
             
             if (index !== -1) {
-                // Invertimos estado de falta
                 turnos[index].falto = !turnos[index].falto;
                 guardarDatos();
-                showToast(turnos[index].falto ? "Se marcó inasistencia (Turno en Rojo)" : "Asistencia restablecida");
+                showToast(turnos[index].falto ? "Se guardó inasistencia" : "Inasistencia removida");
                 cerrarModalOpciones();
                 renderizarGrilla();
                 actualizarEstadisticas();
             } else {
-                // Si es una réplica virtual de un turno Fijo, para poder modificarlo (marcar falta)
-                // debemos transformarlo en un turno específico real en esta semana y aplicarle el cambio.
+                // Caso que sea una réplica de turno fijo heredado
                 const turnoVirtual = obtenerTurnoEn(
                     parseInt(document.getElementById("selectReagendaDia").value),
                     document.getElementById("selectReagendaHora").value,
@@ -981,20 +1021,20 @@
                 );
 
                 if (turnoVirtual && turnoVirtual.replicaFijo) {
-                    // Creamos el registro real para esta semana
-                    const turnoRealizado = {
+                    // Creamos copia real para esta semana y le aplicamos la falta
+                    const copiaFalta = {
                         ...turnoVirtual,
                         id: 'turno-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-                        fijo: false, // El original sigue existiendo, pero creamos esta versión para esta semana
-                        falto: true, // Lo marcamos como inasistencia
+                        fijo: false, 
+                        falto: true, 
                         fechaSemanaRef: formatearFechaID(fechaLunesActual)
                     };
-                    delete turnoRealizado.replicaFijo;
-                    delete turnoRealizado.fechaSemanaRefActual;
+                    delete copiaFalta.replicaFijo;
+                    delete copiaFalta.fechaSemanaRefActual;
 
-                    turnos.push(turnoRealizado);
+                    turnos.push(copiaFalta);
                     guardarDatos();
-                    showToast("Ausente guardado en esta semana específica");
+                    showToast("Inasistencia registrada para esta semana específica");
                     cerrarModalOpciones();
                     renderizarGrilla();
                     actualizarEstadisticas();
@@ -1002,7 +1042,7 @@
             }
         }
 
-        // ACCIÓN: REAGENDAR TURNO A OTRA SEMANA / DÍA / HORA
+        // ACCIÓN: REAGENDAR A OTRA FECHA
         function confirmarReagenda() {
             if (!idTurnoSeleccionado) return;
 
@@ -1010,7 +1050,7 @@
             const nuevoDia = parseInt(document.getElementById("selectReagendaDia").value);
             const nuevaHora = document.getElementById("selectReagendaHora").value;
 
-            // 1. Validar que no haya otro turno ya reservado en ese destino específico
+            // Comprobar colisión en el destino
             const ocupado = turnos.some(t => 
                 t.dia === nuevoDia && 
                 t.hora === nuevaHora && 
@@ -1019,19 +1059,17 @@
             );
 
             if (ocupado) {
-                showToast("Error: Ya hay un turno agendado en ese horario de destino.");
+                showToast("Error: Ya hay un turno agendado en ese casillero de destino.");
                 return;
             }
 
             const index = turnos.findIndex(t => t.id === idTurnoSeleccionado);
             
             if (index !== -1) {
-                // Mover el turno real
                 turnos[index].fechaSemanaRef = nuevaSemanaRef;
                 turnos[index].dia = nuevoDia;
                 turnos[index].hora = nuevaHora;
                 
-                // Si el turno que movió era Fijo, le preguntamos si quiere desactivar lo fijo al mover
                 if (turnos[index].fijo) {
                     if (confirm("Este es un turno FIJO. Si lo mueves de forma individual, ¿deseas convertirlo en un turno normal solo para esa fecha nueva? (Aceptar = Normal, Cancelar = Sigue Fijo en el nuevo horario)")) {
                         turnos[index].fijo = false;
@@ -1044,7 +1082,7 @@
                 renderizarGrilla();
                 actualizarEstadisticas();
             } else {
-                // Si es un turno Virtual/Réplica, creamos la instancia para reagendarlo
+                // Caso que provenga de una réplica
                 const turnoVirtual = obtenerTurnoEn(
                     parseInt(document.getElementById("selectReagendaDia").value),
                     document.getElementById("selectReagendaHora").value,
@@ -1052,19 +1090,18 @@
                 );
 
                 if (turnoVirtual && turnoVirtual.replicaFijo) {
-                    // Creamos el nuevo registro para la nueva semana elegida
-                    const nuevoTurnoMover = {
+                    const copiaNueva = {
                         ...turnoVirtual,
                         id: 'turno-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-                        fijo: false, // Pasa a ser normal en su nueva posición
+                        fijo: false, 
                         fechaSemanaRef: nuevaSemanaRef,
                         dia: nuevoDia,
                         hora: nuevaHora
                     };
-                    delete nuevoTurnoMover.replicaFijo;
-                    delete nuevoTurnoMover.fechaSemanaRefActual;
+                    delete copiaNueva.replicaFijo;
+                    delete copiaNueva.fechaSemanaRefActual;
 
-                    turnos.push(nuevoTurnoMover);
+                    turnos.push(copiaNueva);
                     guardarDatos();
                     showToast("Copia del turno fijo reubicada correctamente");
                     cerrarModalOpciones();
@@ -1074,7 +1111,7 @@
             }
         }
 
-        // ACCIÓN: TRANSICION DE MODAL GESTIONAR -> MODAL EDITAR DETALLES
+        // TRANSICIÓN GESTIONAR -> MODAL EDITAR DETALLES
         function abrirEditarDesdeOpciones() {
             if (!idTurnoSeleccionado) return;
 
@@ -1082,14 +1119,13 @@
             cerrarModalOpciones();
 
             if (turno) {
-                // Abrir modal de edición rellenando los datos del original
                 idTurnoSeleccionado = turno.id;
                 document.getElementById("inputTurnoId").value = turno.id;
                 document.getElementById("inputDia").value = turno.dia;
                 document.getElementById("inputHora").value = turno.hora;
                 
                 const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-                document.getElementById("modalTitulo").textContent = "Editar Detalles del Turno";
+                document.getElementById("modalTitulo").textContent = "Editar Detalles";
                 document.getElementById("modalSubtitulo").textContent = `${nombresDias[turno.dia]} a las ${turno.hora} hs`;
 
                 document.getElementById("inputNombre").value = turno.nombre;
@@ -1097,15 +1133,15 @@
                 document.getElementById("inputSena").value = turno.sena;
                 document.getElementById("inputFijo").checked = turno.fijo;
 
-                // Mostrar botón eliminar
                 document.getElementById("btnEliminar").classList.remove("hidden");
                 document.getElementById("modalTurno").classList.remove("hidden");
+                actualizarAlertaHistorial();
             } else {
                 showToast("Para editar turnos fijos recurrentes, modifícalos desde la semana de origen.");
             }
         }
 
-        // ACCIÓN: ELIMINAR DIRECTAMENTE DESDE LA VENTANA EXTENDIDA
+        // ELIMINAR DESDE VENTANA EXTENDIDA
         function eliminarDesdeOpciones() {
             if (!idTurnoSeleccionado) return;
             if (confirm("¿Estás completamente seguro de eliminar este turno?")) {
@@ -1114,32 +1150,30 @@
                 cerrarModalOpciones();
                 renderizarGrilla();
                 actualizarEstadisticas();
-                showToast("Turno eliminado con éxito");
+                showToast("Turno eliminado.");
             }
         }
 
-        // ELIMINAR TODA LA BASE DE DATOS
+        // BORRAR TODO EL SISTEMA
         function limpiarTodo() {
-            if (confirm("¡ATENCIÓN! Esto borrará absolutamente todos los turnos registrados de forma permanente. ¿Deseas continuar?")) {
+            if (confirm("¡ATENCIÓN! Esto borrará permanentemente todo tu historial, estadísticas y turnos. ¿Proceder?")) {
                 turnos = [];
                 guardarDatos();
                 renderizarGrilla();
                 actualizarEstadisticas();
-                showToast("Se han restablecido todos los turnos");
+                showToast("Todo el sistema ha sido restablecido.");
             }
         }
 
-        // FEEDBACK TOAST FLOTANTE
+        // MOSTRAR MENSAJE TOAST
         function showToast(mensaje) {
             const toast = document.getElementById("toast");
             document.getElementById("toastMsg").textContent = mensaje;
             
-            // Transición de entrada
             toast.classList.remove("translate-y-20", "opacity-0");
             toast.classList.add("translate-y-0", "opacity-100");
             
             setTimeout(() => {
-                // Transición de salida
                 toast.classList.remove("translate-y-0", "opacity-100");
                 toast.classList.add("translate-y-20", "opacity-0");
             }, 3000);
@@ -1147,5 +1181,3 @@
     </script>
 </body>
 </html>
-
-```
