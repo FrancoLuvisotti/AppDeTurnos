@@ -39,7 +39,7 @@
                     <i data-lucide="calendar-range" class="w-7 h-7 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">TurneroPro <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-normal align-middle ml-1">v3.3</span></h1>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">TurneroPro <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-normal align-middle ml-1">v3.4</span></h1>
                     <p class="text-[11px] text-indigo-200">16:00 a 00:00 hs • Base de Clientes Persistente</p>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                     
                     <!-- Encabezados de Días (Lunes a Domingo) -->
                     <div class="grid grid-cols-8 bg-slate-100 text-slate-700 font-bold text-xs uppercase border-b border-slate-200 py-3 sticky top-0 z-10">
-                        <div class="text-center flex items-center justify-center border-r border-slate-200 font-bold text-slate-500">
+                        <div class="text-center flex items-center justify-center border-r border-slate-200 font-bold text-slate-500 font-bold text-indigo-900 bg-slate-200/50">
                             Hora
                         </div>
                         <div class="text-center border-r border-slate-200 px-1">
@@ -196,6 +196,7 @@
                     </div>
 
                     <!-- Filas Horarias (16:00 a 00:00) -->
+                    <!-- NOTA: Contiene un Escuchador de Eventos (Event Delegation) configurado por JS -->
                     <div id="contenedorFilas" class="divide-y divide-slate-200 bg-white">
                         <!-- Se genera dinámicamente con JS -->
                     </div>
@@ -463,6 +464,33 @@
             actualizarEstadisticas();
             actualizarLabelSemana();
             ejecutarIconos();
+            
+            // CONFIGURAR ESCUCHADOR DE EVENTOS CENTRALIZADO EN LA GRILLA
+            // Esto asegura interactividad infalible en cualquier navegador (móvil o escritorio)
+            document.getElementById("contenedorFilas").addEventListener("click", (e) => {
+                // 1. Detectar si el usuario presionó una celda de turno reservado
+                const celdaTurno = e.target.closest("[data-turno-id]");
+                if (celdaTurno) {
+                    const dia = parseInt(celdaTurno.getAttribute("data-dia"));
+                    const hora = celdaTurno.getAttribute("data-hora");
+                    const semanaId = formatearFechaID(fechaLunesActual);
+                    
+                    const turno = obtenerTurnoEn(dia, hora, semanaId);
+                    if (turno) {
+                        abrirOpcionesTurno(turno);
+                    }
+                    return;
+                }
+
+                // 2. Detectar si presionó un casillero vacío para agendar
+                const celdaVacia = e.target.closest(".celda-vacia");
+                if (celdaVacia) {
+                    const dia = parseInt(celdaVacia.getAttribute("data-dia"));
+                    const hora = celdaVacia.getAttribute("data-hora");
+                    abrirAgendarNuevo(dia, hora);
+                    return;
+                }
+            });
         });
 
         // Safe loader para los iconos de Lucide
@@ -479,19 +507,21 @@
         // Rellenar selectores de horas con intervalos de 30 minutos
         function rellenarSelectoresHoras() {
             const inputHora = document.getElementById("inputHora");
-            inputHora.innerHTML = "";
-            for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
-                const hStr = String(h).padStart(2, '0');
-                
-                const opt1 = document.createElement("option");
-                opt1.value = `${hStr}:00`;
-                opt1.textContent = `${hStr}:00`;
-                inputHora.appendChild(opt1);
+            if (inputHora) {
+                inputHora.innerHTML = "";
+                for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
+                    const hStr = String(h).padStart(2, '0');
+                    
+                    const opt1 = document.createElement("option");
+                    opt1.value = `${hStr}:00`;
+                    opt1.textContent = `${hStr}:00`;
+                    inputHora.appendChild(opt1);
 
-                const opt2 = document.createElement("option");
-                opt2.value = `${hStr}:30`;
-                opt2.textContent = `${hStr}:30`;
-                inputHora.appendChild(opt2);
+                    const opt2 = document.createElement("option");
+                    opt2.value = `${hStr}:30`;
+                    opt2.textContent = `${hStr}:30`;
+                    inputHora.appendChild(opt2);
+                }
             }
         }
 
@@ -598,52 +628,62 @@
             const txtInicio = `${fechaLunesActual.getDate()} de ${meses[fechaLunesActual.getMonth()]}`;
             const txtFin = `${finDeSemana.getDate()} de ${meses[finDeSemana.getMonth()]}`;
             
-            document.getElementById("labelSemana").textContent = `${txtInicio} - ${txtFin} (${fechaLunesActual.getFullYear()})`;
+            const lbl = document.getElementById("labelSemana");
+            if (lbl) {
+                lbl.textContent = `${txtInicio} - ${txtFin} (${fechaLunesActual.getFullYear()})`;
+            }
 
             // Fechas en la cabecera
             for (let i = 0; i < 7; i++) {
                 const tempDate = new Date(fechaLunesActual);
                 tempDate.setDate(tempDate.getDate() + i);
-                document.getElementById(`fecha-${i}`).textContent = formatearDiaMes(tempDate);
+                const elHeader = document.getElementById(`fecha-${i}`);
+                if (elHeader) {
+                    elHeader.textContent = formatearDiaMes(tempDate);
+                }
             }
         }
 
         // SELECTORES DE TRASLADO / REAGENDA
         function generarControlesReagenda() {
             const selectHora = document.getElementById("selectReagendaHora");
-            selectHora.innerHTML = "";
-            for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
-                const hStr = String(h).padStart(2, '0');
-                
-                const opt1 = document.createElement("option");
-                opt1.value = `${hStr}:00`;
-                opt1.textContent = `${hStr}:00`;
-                selectHora.appendChild(opt1);
+            if (selectHora) {
+                selectHora.innerHTML = "";
+                for (let h = HORARIO_INICIO; h < HORARIO_FIN; h++) {
+                    const hStr = String(h).padStart(2, '0');
+                    
+                    const opt1 = document.createElement("option");
+                    opt1.value = `${hStr}:00`;
+                    opt1.textContent = `${hStr}:00`;
+                    selectHora.appendChild(opt1);
 
-                const opt2 = document.createElement("option");
-                opt2.value = `${hStr}:30`;
-                opt2.textContent = `${hStr}:30`;
-                selectHora.appendChild(opt2);
+                    const opt2 = document.createElement("option");
+                    opt2.value = `${hStr}:30`;
+                    opt2.textContent = `${hStr}:30`;
+                    selectHora.appendChild(opt2);
+                }
             }
 
             // Próximas 8 semanas
             const selectSemana = document.getElementById("selectReagendaSemana");
-            selectSemana.innerHTML = "";
-            const lunesRef = obtenerLunesDeSemana(new Date());
-            
-            for (let s = 0; s < 8; s++) {
-                const tempLunes = new Date(lunesRef);
-                tempLunes.setDate(tempLunes.getDate() + (s * 7));
+            if (selectSemana) {
+                selectSemana.innerHTML = "";
+                const lunesRef = obtenerLunesDeSemana(new Date());
                 
-                const opt = document.createElement("option");
-                opt.value = formatearFechaID(tempLunes);
-                
-                let etiqueta = `Semana del ${tempLunes.getDate()}/${tempLunes.getMonth()+1}`;
-                if (s === 0) etiqueta += " (Esta semana)";
-                else if (s === 1) etiqueta += " (Próx. semana)";
+                for (let s = 0; s < 8; s++) {
+                    const tempLunes = new Date(lunesRef);
+                    tempLunes.setDate(tempLunes.getDate() + (s * 7));
+                    
+                    const opt = document.createElement("option");
+                    opt.value = formatearFechaID(tempLunes);
+                    
+                    let etiqueta = `Semana del ${tempLunes.getDate()}/${tempLunes.getMonth()+1}`;
+                    if (s === 0) etiqueta += " (Esta semana)";
+                    else if (s === 1) etiqueta += " (Próx. semana)";
 
-                opt.textContent = etiqueta;
-                selectSemana.appendChild(opt);
+                    opt.textContent = etiqueta;
+                    selectSemana.appendChild(opt);
+                }
             }
         }
 
@@ -714,9 +754,10 @@
             return null;
         }
 
-        // RENDERIZAR GRILLA HORARIA (INTERACTIVIDAD REDISEÑADA EN LA CELDA DE LA GRILLA)
+        // RENDERIZAR GRILLA HORARIA
         function renderizarGrilla() {
             const contenedor = document.getElementById("contenedorFilas");
+            if (!contenedor) return;
             contenedor.innerHTML = "";
             const semanaId = formatearFechaID(fechaLunesActual);
 
@@ -759,14 +800,12 @@
                                 badgeClass = "bg-emerald-200 text-emerald-850";
                             }
 
-                            // Aplicamos clases de interactividad y estilo directamente a celdaDia
-                            celdaDia.className = `border-r border-slate-200 p-2 flex flex-col justify-between relative cursor-pointer transition-all min-h-[70px] m-0.5 rounded-lg border shadow-xs duration-100 active:scale-[0.98] ${bgClass}`;
+                            // Atributos de datos que leerá el listener centralizado al hacer click
+                            celdaDia.setAttribute("data-dia", dia);
+                            celdaDia.setAttribute("data-hora", horaFormateada);
+                            celdaDia.setAttribute("data-turno-id", turno.id);
                             
-                            // Evento de clic infalible
-                            celdaDia.onclick = (e) => {
-                                e.stopPropagation(); 
-                                abrirOpcionesTurno(turno);
-                            };
+                            celdaDia.className = `border-r border-slate-200 p-2 flex flex-col justify-between relative cursor-pointer transition-all min-h-[72px] m-0.5 rounded-lg border shadow-xs duration-100 active:scale-[0.98] ${bgClass}`;
 
                             celdaDia.innerHTML = `
                                 <div class="font-bold flex items-center justify-between gap-1 w-full text-[11px] leading-tight pointer-events-none">
@@ -779,13 +818,12 @@
                                     <span class="truncate">${turno.telefono}</span>
                                 </div>
 
-                                <!-- Resumen persistente de partidos jugados y faltas -->
-                                <div class="text-[9px] bg-white/70 rounded px-1.5 py-0.5 mt-1.5 border border-black/5 flex items-center justify-between text-slate-700 font-bold w-full pointer-events-none">
+                                <div class="text-[9px] bg-white/70 rounded px-1.5 py-0.5 mt-1 border border-black/5 flex items-center justify-between text-slate-700 font-bold w-full pointer-events-none">
                                     <span>Jugó: ${hist.jugo}</span>
                                     <span class="text-rose-700 font-extrabold">Faltó: ${hist.falto}</span>
                                 </div>
 
-                                <div class="mt-1.5 flex items-center justify-between gap-1 pt-1 border-t border-black/5 w-full pointer-events-none">
+                                <div class="mt-1 flex items-center justify-between gap-1 pt-1 border-t border-black/5 w-full pointer-events-none">
                                     <span class="font-bold text-[10px] text-slate-800">
                                         $${(turno.sena || 0).toLocaleString('es-AR')}
                                     </span>
@@ -795,12 +833,11 @@
                                 </div>
                             `;
                         } else {
-                            // Celda de slot vacío para agendar
-                            celdaDia.className = "border-r border-slate-200 p-1 flex flex-col justify-stretch items-center justify-center relative cursor-pointer transition-all hover:bg-indigo-50/50 min-h-[70px] m-0.5 rounded-lg border border-transparent";
+                            // Casillero vacío para agendar
+                            celdaDia.setAttribute("data-dia", dia);
+                            celdaDia.setAttribute("data-hora", horaFormateada);
+                            celdaDia.className = "celda-vacia border-r border-slate-200 p-1 flex flex-col justify-stretch items-center justify-center relative cursor-pointer transition-all hover:bg-indigo-50/50 min-h-[72px] m-0.5 rounded-lg border border-transparent";
                             
-                            celdaDia.onclick = () => {
-                                abrirAgendarNuevo(dia, horaFormateada);
-                            };
                             celdaDia.innerHTML = `
                                 <div class="opacity-0 hover:opacity-100 transition-opacity duration-150 flex items-center justify-center pointer-events-none">
                                     <span class="bg-indigo-600 text-white rounded-full p-1 shadow-md inline-block">
@@ -849,16 +886,22 @@
                 }
             }
 
-            document.getElementById("statSinSena").textContent = sinSena;
-            document.getElementById("statConSena").textContent = conSena;
-            document.getElementById("statFaltaron").textContent = faltaron;
+            const elSinSena = document.getElementById("statSinSena");
+            const elConSena = document.getElementById("statConSena");
+            const elFaltaron = document.getElementById("statFaltaron");
+
+            if (elSinSena) elSinSena.textContent = sinSena;
+            if (elConSena) elConSena.textContent = conSena;
+            if (elFaltaron) elFaltaron.textContent = faltaron;
         }
 
         // ALERTA DE INASISTENCIA INSTANTÁNEA EN EL FORMULARIO
         function actualizarAlertaHistorial() {
-            const tel = document.getElementById("inputTelefono").value;
+            const telInput = document.getElementById("inputTelefono");
             const alertaBox = document.getElementById("alertaInasistencia");
+            if (!telInput || !alertaBox) return;
 
+            const tel = telInput.value;
             const hist = obtenerHistorialCliente(tel);
 
             if (hist.falto > 0) {
@@ -880,52 +923,79 @@
             }
         }
 
-        // ABRIR FORMULARIO DESDE CASILLERO
+        // ABRIR FORMULARIO DESDE CASILLERO Vacío
         function abrirAgendarNuevo(dia, hora) {
             idTurnoSeleccionado = null; 
-            document.getElementById("inputTurnoId").value = "";
             
-            document.getElementById("inputDia").value = dia;
-            document.getElementById("inputHora").value = hora;
+            const inId = document.getElementById("inputTurnoId");
+            const inDia = document.getElementById("inputDia");
+            const inHora = document.getElementById("inputHora");
+            const modalTit = document.getElementById("modalTitulo");
+            const modalSub = document.getElementById("modalSubtitulo");
+
+            if (inId) inId.value = "";
+            if (inDia) inDia.value = dia;
+            if (inHora) inHora.value = hora;
             
-            document.getElementById("modalTitulo").textContent = "Agendar Turno";
-            document.getElementById("modalSubtitulo").textContent = `Registrando un turno para el día seleccionado`;
+            if (modalTit) modalTit.textContent = "Agendar Turno";
+            if (modalSub) modalSub.textContent = `Registrando un turno para el día seleccionado`;
 
             // Reset campos
-            document.getElementById("inputNombre").value = "";
-            document.getElementById("inputTelefono").value = "";
-            document.getElementById("inputSena").value = 0;
-            document.getElementById("inputFijo").checked = false;
-            document.getElementById("alertaInasistencia").className = "hidden";
+            const inNom = document.getElementById("inputNombre");
+            const inTel = document.getElementById("inputTelefono");
+            const inSena = document.getElementById("inputSena");
+            const inFijo = document.getElementById("inputFijo");
+            const alertBox = document.getElementById("alertaInasistencia");
+            const btnElim = document.getElementById("btnEliminar");
+            const modTurno = document.getElementById("modalTurno");
 
-            document.getElementById("btnEliminar").classList.add("hidden");
-            document.getElementById("modalTurno").classList.remove("hidden");
+            if (inNom) inNom.value = "";
+            if (inTel) inTel.value = "";
+            if (inSena) inSena.value = 0;
+            if (inFijo) inFijo.checked = false;
+            if (alertBox) alertBox.className = "hidden";
+            if (btnElim) btnElim.classList.add("hidden");
+            if (modTurno) modTurno.classList.remove("hidden");
         }
 
         // AGENDAR DESDE BOTÓN SUPERIOR
         function abrirAgendarManual() {
             idTurnoSeleccionado = null;
-            document.getElementById("inputTurnoId").value = "";
             
-            document.getElementById("inputDia").value = 0;
-            document.getElementById("inputHora").value = "16:00";
+            const inId = document.getElementById("inputTurnoId");
+            const inDia = document.getElementById("inputDia");
+            const inHora = document.getElementById("inputHora");
+            const modalTit = document.getElementById("modalTitulo");
+            const modalSub = document.getElementById("modalSubtitulo");
+
+            if (inId) inId.value = "";
+            if (inDia) inDia.value = 0;
+            if (inHora) inHora.value = "16:00";
             
-            document.getElementById("modalTitulo").textContent = "Nuevo Turno Rápido";
-            document.getElementById("modalSubtitulo").textContent = "Introduce el día, hora y datos del cliente para reservar.";
+            if (modalTit) modalTit.textContent = "Nuevo Turno Rápido";
+            if (modalSub) modalSub.textContent = "Introduce el día, hora y datos del cliente para reservar.";
 
             // Reset
-            document.getElementById("inputNombre").value = "";
-            document.getElementById("inputTelefono").value = "";
-            document.getElementById("inputSena").value = 0;
-            document.getElementById("inputFijo").checked = false;
-            document.getElementById("alertaInasistencia").className = "hidden";
+            const inNom = document.getElementById("inputNombre");
+            const inTel = document.getElementById("inputTelefono");
+            const inSena = document.getElementById("inputSena");
+            const inFijo = document.getElementById("inputFijo");
+            const alertBox = document.getElementById("alertaInasistencia");
+            const btnElim = document.getElementById("btnEliminar");
+            const modTurno = document.getElementById("modalTurno");
 
-            document.getElementById("btnEliminar").classList.add("hidden");
-            document.getElementById("modalTurno").classList.remove("hidden");
+            if (inNom) inNom.value = "";
+            if (inTel) inTel.value = "";
+            if (inSena) inSena.value = 0;
+            if (inFijo) inFijo.checked = false;
+            if (alertBox) alertBox.className = "hidden";
+            if (btnElim) btnElim.classList.add("hidden");
+            if (modTurno) modTurno.classList.remove("hidden");
         }
 
         function cerrarModalTurno() {
-            document.getElementById("modalTurno").classList.add("hidden");
+            const m = document.getElementById("modalTurno");
+            if (m) m.classList.add("hidden");
             idTurnoSeleccionado = null;
         }
 
@@ -1026,70 +1096,94 @@
             
             // Cambiar color de cabecera del modal dinámicamente según el estado
             const header = document.getElementById("opcionesHeader");
-            header.className = "p-5 text-white transition-all duration-200";
-            
-            if (turno.falto) {
-                header.classList.add("bg-rose-600");
-            } else if (turno.sena > 0) {
-                header.classList.add("bg-emerald-600");
-            } else {
-                header.classList.add("bg-amber-500", "text-slate-900");
+            if (header) {
+                header.className = "p-5 text-white transition-all duration-200";
+                
+                if (turno.falto) {
+                    header.classList.add("bg-rose-600");
+                } else if (turno.sena > 0) {
+                    header.classList.add("bg-emerald-600");
+                } else {
+                    header.classList.add("bg-amber-500", "text-slate-900");
+                }
             }
 
             const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-            document.getElementById("opcionesTitulo").textContent = turno.fijo ? "Turno Fijo Activo" : "Detalles del Turno";
-            document.getElementById("opcionesCliente").textContent = turno.nombre;
-            document.getElementById("opcionesHorario").textContent = `${nombresDias[turno.dia]} a las ${turno.hora} hs`;
+            const opTit = document.getElementById("opcionesTitulo");
+            const opCli = document.getElementById("opcionesCliente");
+            const opHor = document.getElementById("opcionesHorario");
+
+            if (opTit) opTit.textContent = turno.fijo ? "Turno Fijo Activo" : "Detalles del Turno";
+            if (opCli) opCli.textContent = turno.nombre;
+            if (opHor) opHor.textContent = `${nombresDias[turno.dia]} a las ${turno.hora} hs`;
 
             // Obtener historial desde la base de datos de clientes persistentes
             const hist = obtenerHistorialCliente(turno.telefono);
-            document.getElementById("historialJugo").textContent = `${hist.jugo} veces`;
-            document.getElementById("historialFalto").textContent = `${hist.falto} veces`;
+            const hisJugo = document.getElementById("historialJugo");
+            const hisFalto = document.getElementById("historialFalto");
 
-            document.getElementById("txtInfoTelefono").textContent = turno.telefono;
-            document.getElementById("txtInfoSena").textContent = `$ ${(turno.sena || 0).toLocaleString('es-AR')}`;
-            document.getElementById("txtInfoFijo").textContent = turno.fijo ? "Fijo (Se replica semanalmente)" : "Solo esta semana";
-            document.getElementById("txtInfoFijo").className = turno.fijo ? "font-bold text-indigo-600" : "font-semibold text-slate-500";
+            if (hisJugo) hisJugo.textContent = `${hist.jugo} veces`;
+            if (hisFalto) hisFalto.textContent = `${hist.falto} veces`;
+
+            const infoTel = document.getElementById("txtInfoTelefono");
+            const infoSena = document.getElementById("txtInfoSena");
+            const infoFij = document.getElementById("txtInfoFijo");
+
+            if (infoTel) infoTel.textContent = turno.telefono;
+            if (infoSena) infoSena.textContent = `$ ${(turno.sena || 0).toLocaleString('es-AR')}`;
+            if (infoFij) {
+                infoFij.textContent = turno.fijo ? "Fijo (Se replica semanalmente)" : "Solo esta semana";
+                infoFij.className = turno.fijo ? "font-bold text-indigo-600" : "font-semibold text-slate-500";
+            }
 
             // Botón de marcar falta
             const btnFalta = document.getElementById("btnMarcarFalta");
-            if (turno.falto) {
-                btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all";
-                btnFalta.innerHTML = `<i data-lucide="user-check" class="w-4 h-4"></i> Quitar Inasistencia`;
-            } else {
-                btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 hover:text-rose-700 font-bold text-xs transition-all";
-                btnFalta.innerHTML = `<i data-lucide="user-x" class="w-4 h-4"></i> Marcar Falta`;
+            if (btnFalta) {
+                if (turno.falto) {
+                    btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all";
+                    btnFalta.innerHTML = `<i data-lucide="user-check" class="w-4 h-4"></i> Quitar Inasistencia`;
+                } else {
+                    btnFalta.className = "flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white hover:bg-rose-50 border border-rose-200 text-rose-600 hover:text-rose-700 font-bold text-xs transition-all";
+                    btnFalta.innerHTML = `<i data-lucide="user-x" class="w-4 h-4"></i> Marcar Falta`;
+                }
             }
 
             // Validar que la opción de semana destino exista
             const selectSemana = document.getElementById("selectReagendaSemana");
             const valDestino = turno.replicaFijo ? turno.fechaSemanaRefActual : turno.fechaSemanaRef;
             
-            let existe = false;
-            for (let i = 0; i < selectSemana.options.length; i++) {
-                if (selectSemana.options[i].value === valDestino) {
-                    existe = true;
-                    break;
+            if (selectSemana) {
+                let existe = false;
+                for (let i = 0; i < selectSemana.options.length; i++) {
+                    if (selectSemana.options[i].value === valDestino) {
+                        existe = true;
+                        break;
+                    }
                 }
-            }
-            if (!existe && valDestino) {
-                const opt = document.createElement("option");
-                opt.value = valDestino;
-                opt.textContent = `Semana del ${valDestino.split('-')[2]}/${valDestino.split('-')[1]} (Actual)`;
-                selectSemana.appendChild(opt);
+                if (!existe && valDestino) {
+                    const opt = document.createElement("option");
+                    opt.value = valDestino;
+                    opt.textContent = `Semana del ${valDestino.split('-')[2]}/${valDestino.split('-')[1]} (Actual)`;
+                    selectSemana.appendChild(opt);
+                }
+                selectSemana.value = valDestino;
             }
 
-            // Preparar valores para selectores de reagendamiento
-            document.getElementById("selectReagendaDia").value = turno.dia;
-            document.getElementById("selectReagendaHora").value = turno.hora;
-            selectSemana.value = valDestino;
+            const rDia = document.getElementById("selectReagendaDia");
+            const rHora = document.getElementById("selectReagendaHora");
 
-            document.getElementById("modalOpciones").classList.remove("hidden");
+            if (rDia) rDia.value = turno.dia;
+            if (rHora) rHora.value = turno.hora;
+
+            const modOpc = document.getElementById("modalOpciones");
+            if (modOpc) modOpc.classList.remove("hidden");
+            
             ejecutarIconos();
         }
 
         function cerrarModalOpciones() {
-            document.getElementById("modalOpciones").classList.add("hidden");
+            const m = document.getElementById("modalOpciones");
+            if (m) m.classList.add("hidden");
             idTurnoSeleccionado = null;
         }
 
@@ -1117,9 +1211,12 @@
                 actualizarEstadisticas();
             } else {
                 // Caso fijo virtual
+                const valDia = document.getElementById("selectReagendaDia") ? document.getElementById("selectReagendaDia").value : 0;
+                const valHora = document.getElementById("selectReagendaHora") ? document.getElementById("selectReagendaHora").value : "16:00";
+                
                 const turnoVirtual = obtenerTurnoEn(
-                    parseInt(document.getElementById("selectReagendaDia").value),
-                    document.getElementById("selectReagendaHora").value,
+                    parseInt(valDia),
+                    valHora,
                     formatearFechaID(fechaLunesActual)
                 );
 
@@ -1151,9 +1248,9 @@
         function confirmarReagenda() {
             if (!idTurnoSeleccionado) return;
 
-            const nuevaSemanaRef = document.getElementById("selectReagendaSemana").value;
-            const nuevoDia = parseInt(document.getElementById("selectReagendaDia").value);
-            const nuevaHora = document.getElementById("selectReagendaHora").value;
+            const nuevaSemanaRef = document.getElementById("selectReagendaSemana") ? document.getElementById("selectReagendaSemana").value : "";
+            const nuevoDia = document.getElementById("selectReagendaDia") ? parseInt(document.getElementById("selectReagendaDia").value) : 0;
+            const nuevaHora = document.getElementById("selectReagendaHora") ? document.getElementById("selectReagendaHora").value : "16:00";
 
             // Verificar colisión
             const ocupado = turnos.some(t => 
@@ -1190,9 +1287,12 @@
                 actualizarEstadisticas();
             } else {
                 // Caso replica virtual
+                const valDia = document.getElementById("selectReagendaDia") ? parseInt(document.getElementById("selectReagendaDia").value) : 0;
+                const valHora = document.getElementById("selectReagendaHora") ? document.getElementById("selectReagendaHora").value : "16:00";
+                
                 const turnoVirtual = obtenerTurnoEn(
-                    parseInt(document.getElementById("selectReagendaDia").value),
-                    document.getElementById("selectReagendaHora").value,
+                    valDia,
+                    valHora,
                     formatearFechaID(fechaLunesActual)
                 );
 
@@ -1232,9 +1332,11 @@
             let turno = turnos.find(t => t.id === idTurnoSeleccionado);
             
             if (!turno) {
+                const valDia = document.getElementById("selectReagendaDia") ? parseInt(document.getElementById("selectReagendaDia").value) : 0;
+                const valHora = document.getElementById("selectReagendaHora") ? document.getElementById("selectReagendaHora").value : "16:00";
                 turno = obtenerTurnoEn(
-                    parseInt(document.getElementById("selectReagendaDia").value),
-                    document.getElementById("selectReagendaHora").value,
+                    valDia,
+                    valHora,
                     formatearFechaID(fechaLunesActual)
                 );
             }
@@ -1242,19 +1344,31 @@
             cerrarModalOpciones();
 
             if (turno) {
-                document.getElementById("inputTurnoId").value = turno.id;
-                document.getElementById("inputDia").value = turno.dia;
-                document.getElementById("inputHora").value = turno.hora;
-                document.getElementById("inputNombre").value = turno.nombre;
-                document.getElementById("inputTelefono").value = turno.telefono;
-                document.getElementById("inputSena").value = turno.sena || 0;
-                document.getElementById("inputFijo").checked = turno.fijo || false;
+                const inId = document.getElementById("inputTurnoId");
+                const inDia = document.getElementById("inputDia");
+                const inHora = document.getElementById("inputHora");
+                const inNom = document.getElementById("inputNombre");
+                const inTel = document.getElementById("inputTelefono");
+                const inSena = document.getElementById("inputSena");
+                const inFijo = document.getElementById("inputFijo");
+                const modTit = document.getElementById("modalTitulo");
+                const modSub = document.getElementById("modalSubtitulo");
+                const btnElim = document.getElementById("btnEliminar");
+                const modTurno = document.getElementById("modalTurno");
 
-                document.getElementById("modalTitulo").textContent = "Modificar Turno";
-                document.getElementById("modalSubtitulo").textContent = "Modifica los detalles del turno seleccionado.";
+                if (inId) inId.value = turno.id;
+                if (inDia) inDia.value = turno.dia;
+                if (inHora) inHora.value = turno.hora;
+                if (inNom) inNom.value = turno.nombre;
+                if (inTel) inTel.value = turno.telefono;
+                if (inSena) inSena.value = turno.sena || 0;
+                if (inFijo) inFijo.checked = turno.fijo || false;
 
-                document.getElementById("btnEliminar").classList.remove("hidden");
-                document.getElementById("modalTurno").classList.remove("hidden");
+                if (modTit) modTit.textContent = "Modificar Turno";
+                if (modSub) modSub.textContent = "Modifica los detalles del turno seleccionado.";
+
+                if (btnElim) btnElim.classList.remove("hidden");
+                if (modTurno) modTurno.classList.remove("hidden");
                 
                 actualizarAlertaHistorial();
             } else {
@@ -1309,9 +1423,12 @@
                     }
                 }
             } else {
+                const valDia = document.getElementById("selectReagendaDia") ? parseInt(document.getElementById("selectReagendaDia").value) : 0;
+                const valHora = document.getElementById("selectReagendaHora") ? document.getElementById("selectReagendaHora").value : "16:00";
+
                 const turnoVirtual = obtenerTurnoEn(
-                    parseInt(document.getElementById("selectReagendaDia").value),
-                    document.getElementById("selectReagendaHora").value,
+                    valDia,
+                    valHora,
                     semanaActualId
                 );
 
@@ -1350,15 +1467,18 @@
         // DISPARADOR DE MENSAJE TOAST FLOTANTE
         function showToast(mensaje) {
             const toast = document.getElementById("toast");
-            document.getElementById("toastMsg").textContent = mensaje;
-            
-            toast.classList.remove("translate-y-20", "opacity-0");
-            toast.classList.add("translate-y-0", "opacity-100");
-            
-            setTimeout(() => {
-                toast.classList.remove("translate-y-0", "opacity-100");
-                toast.classList.add("translate-y-20", "opacity-0");
-            }, 3000);
+            if (toast) {
+                const msg = document.getElementById("toastMsg");
+                if (msg) msg.textContent = mensaje;
+                
+                toast.classList.remove("translate-y-20", "opacity-0");
+                toast.classList.add("translate-y-0", "opacity-100");
+                
+                setTimeout(() => {
+                    toast.classList.remove("translate-y-0", "opacity-100");
+                    toast.classList.add("translate-y-20", "opacity-0");
+                }, 3000);
+            }
         }
     </script>
 </body>
