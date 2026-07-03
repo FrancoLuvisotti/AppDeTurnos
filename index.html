@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,7 +38,7 @@
                     <i data-lucide="calendar-range" class="w-7 h-7 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">TurneroPro <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-normal align-middle ml-1">v3.1</span></h1>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">TurneroPro <span class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-normal align-middle ml-1">v3.2</span></h1>
                     <p class="text-[11px] text-indigo-200">16:00 a 00:00 hs • Base de Clientes Persistente</p>
                 </div>
             </div>
@@ -745,10 +744,10 @@
                             let badgeClass = "bg-yellow-200 text-yellow-850";
                             
                             if (turno.falto) {
-                                bgClass = "bg-rose-100 hover:bg-rose-200 text-rose-950 border-rose-300 animate-pulse"; 
+                                bgClass = "bg-rose-100 hover:bg-rose-200 text-rose-955 border-rose-300 animate-pulse"; 
                                 badgeClass = "bg-rose-200 text-rose-850";
                             } else if (turno.sena > 0) {
-                                bgClass = "bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border-emerald-300"; 
+                                bgClass = "bg-emerald-100 hover:bg-emerald-200 text-emerald-955 border-emerald-300"; 
                                 badgeClass = "bg-emerald-200 text-emerald-850";
                             }
 
@@ -756,9 +755,9 @@
                             const cardElement = document.createElement("div");
                             cardElement.className = `${bgClass} border rounded-lg shadow-sm p-1.5 flex flex-col justify-between h-full text-[11px] leading-tight cursor-pointer transform active:scale-[0.97] transition-all select-none duration-100`;
                             
-                            // Evento de clic directo e indiscutible a la CARD
+                            // Evento de clic directo a la CARD
                             cardElement.onclick = (e) => {
-                                e.stopPropagation(); // Evitar burbujeo no deseado
+                                e.stopPropagation(); 
                                 abrirOpcionesTurno(turno);
                             };
 
@@ -945,7 +944,6 @@
                 // Modo Edición
                 const index = turnos.findIndex(t => t.id === id);
                 if (index !== -1) {
-                    // Actualizar el registro del cliente
                     asegurarRegistroCliente(telefono, nombre, 0, 0);
 
                     turnos[index].nombre = nombre;
@@ -964,7 +962,6 @@
                     return;
                 }
 
-                // Asegurar que el cliente existe en la DB persistente y sumarle 1 jugada
                 asegurarRegistroCliente(telefono, nombre, 1, 0);
 
                 const nuevo = {
@@ -1015,7 +1012,7 @@
             }
         }
 
-        // ABRIR GESTIÓN EXTENDIDA DE UN TURNO (CORREGIDA SELECCIÓN DE SEMANAS FUERA DE RANGO)
+        // ABRIR GESTIÓN EXTENDIDA DE UN TURNO
         function abrirOpcionesTurno(turno) {
             idTurnoSeleccionado = turno.id;
             
@@ -1056,7 +1053,7 @@
                 btnFalta.innerHTML = `<i data-lucide="user-x" class="w-4 h-4"></i> Marcar Falta`;
             }
 
-            // Validar que la opción de semana destino exista, o agregarla dinámicamente si es anterior/futura
+            // Validar que la opción de semana destino exista
             const selectSemana = document.getElementById("selectReagendaSemana");
             const valDestino = turno.replicaFijo ? turno.fechaSemanaRefActual : turno.fechaSemanaRef;
             
@@ -1088,7 +1085,7 @@
             idTurnoSeleccionado = null;
         }
 
-        // MARCAR INASISTENCIA (Cambia el turno a color rojo y actualiza de forma permanente la DB de clientes)
+        // MARCAR INASISTENCIA
         function toggleFalta() {
             if (!idTurnoSeleccionado) return;
             
@@ -1099,11 +1096,9 @@
                 t.falto = !t.falto;
 
                 if (t.falto) {
-                    // Restamos 1 jugado y sumamos 1 falta
                     asegurarRegistroCliente(t.telefono, t.nombre, -1, 1);
                     showToast("Inasistencia guardada en el historial");
                 } else {
-                    // Quitamos la falta: sumamos 1 jugado y restamos 1 falta
                     asegurarRegistroCliente(t.telefono, t.nombre, 1, -1);
                     showToast("Asistencia normalizada");
                 }
@@ -1113,7 +1108,7 @@
                 renderizarGrilla();
                 actualizarEstadisticas();
             } else {
-                // En caso de que sea una réplica de un turno fijo
+                // Caso fijo virtual
                 const turnoVirtual = obtenerTurnoEn(
                     parseInt(document.getElementById("selectReagendaDia").value),
                     document.getElementById("selectReagendaHora").value,
@@ -1132,7 +1127,6 @@
                     delete copiaConFalta.replicaFijo;
                     delete copiaConFalta.fechaSemanaRefActual;
 
-                    // Ajustar contadores
                     asegurarRegistroCliente(turnoVirtual.telefono, turnoVirtual.nombre, -1, 1);
 
                     turnos.push(copiaConFalta);
@@ -1361,5 +1355,3 @@
     </script>
 </body>
 </html>
-
-```
