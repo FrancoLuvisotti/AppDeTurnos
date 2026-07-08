@@ -1,0 +1,194 @@
+<!-- MODAL 1: Formulario para Agendar / Editar Turno -->
+<div id="modalTurno" class="modal hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title-row">
+                <h3 id="modalTitulo">Agendar Turno</h3>
+                <button type="button" onclick="cerrarModalTurno()" class="modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p id="modalSubtitulo">Parametros del turno</p>
+        </div>
+
+        <form id="formTurno" onsubmit="guardarTurno(event)" class="modal-form">
+            <input type="hidden" id="inputTurnoId">
+
+            <div class="form-grid form-grid-box">
+                <div>
+                    <label>Dia Reservado</label>
+                    <select id="inputDia">
+                        <option value="0">Lunes</option>
+                        <option value="1">Martes</option>
+                        <option value="2">Miercoles</option>
+                        <option value="3">Jueves</option>
+                        <option value="4">Viernes</option>
+                        <option value="5">Sabado</option>
+                        <option value="6">Domingo</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Horario</label>
+                    <select id="inputHora"></select>
+                </div>
+            </div>
+
+            <div>
+                <label>Telefono de Contacto *</label>
+                <div class="field-with-icon">
+                    <span><i data-lucide="phone"></i></span>
+                    <input type="tel" id="inputTelefono" required onkeyup="actualizarAlertaHistorial()" onchange="actualizarAlertaHistorial()" placeholder="Ej: 1123456789">
+                </div>
+            </div>
+
+            <div>
+                <label>Nombre del Cliente *</label>
+                <div class="field-with-icon">
+                    <span><i data-lucide="user"></i></span>
+                    <input type="text" id="inputNombre" required onkeyup="actualizarAlertaHistorial()" onchange="actualizarAlertaHistorial()" placeholder="Ej: Juan Perez">
+                </div>
+            </div>
+
+            <div id="alertaInasistencia" class="hidden"></div>
+
+            <div class="form-grid">
+                <div>
+                    <label>Monto de Sena ($ Pesos)</label>
+                    <div class="field-with-prefix">
+                        <span>$</span>
+                        <input type="number" id="inputSena" min="0" value="0" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="fixed-toggle-wrap">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="inputFijo">
+                        <span class="toggle-ui"></span>
+                        <span>Turno Fijo?</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="btnEliminar" onclick="eliminarTurnoActual()" class="delete-button hidden">
+                    Eliminar
+                </button>
+                <div class="form-actions-right">
+                    <button type="button" onclick="cerrarModalTurno()" class="secondary-button">Cancelar</button>
+                    <button type="submit" class="submit-button">Guardar Turno</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: Acciones Extendidas / Gestion del Turno -->
+<div id="modalOpciones" class="modal hidden">
+    <div class="modal-card">
+        <div id="opcionesHeader" class="modal-header modal-header-solid">
+            <div class="modal-title-row">
+                <h3 id="opcionesTitulo">Gestionar Turno</h3>
+                <button type="button" onclick="cerrarModalOpciones()" class="modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p id="opcionesCliente" class="modal-client">Nombre</p>
+            <p id="opcionesHorario">Dia y Hora</p>
+        </div>
+
+        <div class="modal-body">
+            <section class="client-history">
+                <h4>
+                    <i data-lucide="database"></i>
+                    Ficha Historica del Cliente
+                </h4>
+
+                <div class="history-grid">
+                    <div class="history-card history-success">
+                        <span>Veces Jugadas</span>
+                        <strong id="historialJugo">0 veces</strong>
+                    </div>
+                    <div class="history-card history-danger">
+                        <span>Veces Faltadas</span>
+                        <strong id="historialFalto">0 veces</strong>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <span>Telefono:</span>
+                    <strong id="txtInfoTelefono">--</strong>
+                </div>
+                <div class="info-row">
+                    <span>Sena actual de este turno:</span>
+                    <strong id="txtInfoSena">$ 0</strong>
+                </div>
+            </section>
+
+            <div class="quick-actions">
+                <button id="btnMarcarFalta" onclick="toggleFalta()" class="quick-button absence-button">
+                    <i data-lucide="user-x"></i>
+                    <span>Falto al Turno</span>
+                </button>
+
+                <button onclick="abrirEditarDesdeOpciones()" class="quick-button edit-button">
+                    <i data-lucide="edit-3"></i>
+                    Editar / Modificar
+                </button>
+            </div>
+
+            <section class="transfer-box">
+                <h4>
+                    <i data-lucide="check-square"></i>
+                    Traspaso / Mover Pagado
+                </h4>
+                <p>Deja este turno intacto en la semana actual y genera una continuacion para la proxima fecha con el remanente de sena que indiques.</p>
+
+                <div class="form-grid compact-grid">
+                    <div>
+                        <label>Semana Destino</label>
+                        <select id="selectReagendaSemana"></select>
+                    </div>
+                    <div>
+                        <label>Dia Destino</label>
+                        <select id="selectReagendaDia">
+                            <option value="0">Lunes</option>
+                            <option value="1">Martes</option>
+                            <option value="2">Miercoles</option>
+                            <option value="3">Jueves</option>
+                            <option value="4">Viernes</option>
+                            <option value="5">Sabado</option>
+                            <option value="6">Domingo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid compact-grid">
+                    <div>
+                        <label>Horario Destino</label>
+                        <select id="selectReagendaHora"></select>
+                    </div>
+                    <div>
+                        <label>Sena prox. Turno</label>
+                        <input type="number" id="inputSenaTraspaso" min="0" value="0">
+                    </div>
+                </div>
+
+                <button onclick="ejecutarMoverPagado()" class="transfer-button">
+                    <i data-lucide="arrow-right-left"></i>
+                    <span>Confirmar Mover Pagado</span>
+                </button>
+            </section>
+
+            <div class="modal-footer-actions">
+                <button onclick="eliminarDesdeOpciones()" class="link-danger">Cancelar / Eliminar Turno</button>
+                <button type="button" onclick="cerrarModalOpciones()" class="secondary-button">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NOTIFICACION TOAST -->
+<div id="toast" class="toast">
+    <i data-lucide="check-circle"></i>
+    <span id="toastMsg">Accion exitosa!</span>
+</div>
