@@ -1,4 +1,4 @@
-const HORARIO_INICIO = 16; 
+const HORARIO_INICIO = 14; 
 const HORARIO_FIN = 24;    
 
 let turnos = [];
@@ -559,7 +559,7 @@ function eliminarDesdeOpciones() {
         const respuesta = confirm(
             "Este es un TURNO FIJO que se repite todas las semanas.\n\n" +
             "• Presiona [ ACEPTAR ] si quieres cancelarlo ÚNICAMENTE EN ESTA SEMANA.\n" +
-            "• Presiona [ CANCELAR ] si deseas BORRARLO DE TODAS LAS SEMANAS DEFINITIVAMENTE."
+            "• Presiona [ BORRAR ] si deseas BORRARLO DE TODAS LAS SEMANAS DEFINITIVAMENTE."
         );
 
         if (respuesta) {
@@ -572,10 +572,10 @@ function eliminarDesdeOpciones() {
             showToast("Cancelado únicamente para esta semana en curso.");
         } else {
             // Acción: Cancelar permanentemente
-            if (confirm("¿Estás 100% seguro de eliminar este turno fijo para siempre de todo el sistema?")) {
+            if (confirm("¿Estás seguro de eliminar este turno fijo?")) {
                 asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 0);
                 turnos = turnos.filter(t => t.id !== turno.id);
-                showToast("Turno fijo destruido de raíz.");
+                showToast("Turno fijo borrado.");
             } else {
                 return;
             }
