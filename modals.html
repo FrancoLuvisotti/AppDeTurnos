@@ -187,6 +187,33 @@
     </div>
 </div>
 
+<!-- MODAL 3: Confirmaciones del sistema -->
+<div id="modalConfirmacion" class="modal hidden">
+    <div class="modal-card confirm-card">
+        <div class="modal-header confirm-header">
+            <div class="modal-title-row">
+                <h3 id="confirmTitulo">Confirmar accion</h3>
+                <button type="button" onclick="cerrarModalConfirmacion(false)" class="modal-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p id="confirmSubtitulo">Revisa antes de continuar</p>
+        </div>
+
+        <div class="confirm-body">
+            <p id="confirmMensaje"></p>
+            <div class="confirm-actions">
+                <button type="button" id="btnConfirmCancelar" onclick="cerrarModalConfirmacion(false)" class="secondary-button">
+                    Cancelar
+                </button>
+                <button type="button" id="btnConfirmAceptar" onclick="cerrarModalConfirmacion(true)" class="submit-button">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- NOTIFICACION TOAST -->
 <div id="toast" class="toast">
     <i data-lucide="check-circle"></i>

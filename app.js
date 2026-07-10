@@ -66,6 +66,44 @@ function ejecutarIconos() {
     try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) {}
 }
 
+function abrirModalConfirmacion(opciones = {}) {
+    const modal = document.getElementById("modalConfirmacion");
+    const titulo = document.getElementById("confirmTitulo");
+    const subtitulo = document.getElementById("confirmSubtitulo");
+    const mensaje = document.getElementById("confirmMensaje");
+    const btnCancelar = document.getElementById("btnConfirmCancelar");
+    const btnAceptar = document.getElementById("btnConfirmAceptar");
+
+    if (!modal || !titulo || !subtitulo || !mensaje || !btnCancelar || !btnAceptar) {
+        return Promise.resolve(false);
+    }
+
+    titulo.textContent = opciones.titulo || "Confirmar accion";
+    subtitulo.textContent = opciones.subtitulo || "Revisa antes de continuar";
+    mensaje.textContent = opciones.mensaje || "";
+    btnCancelar.textContent = opciones.cancelar || "Cancelar";
+    btnAceptar.textContent = opciones.aceptar || "Aceptar";
+    btnAceptar.classList.toggle("danger-button", opciones.peligro === true);
+
+    modal.classList.remove("hidden");
+    ejecutarIconos();
+    btnAceptar.focus();
+
+    return new Promise(resolve => {
+        resolverModalConfirmacion = resolve;
+    });
+}
+
+function cerrarModalConfirmacion(resultado) {
+    const modal = document.getElementById("modalConfirmacion");
+    if (modal) modal.classList.add("hidden");
+
+    if (resolverModalConfirmacion) {
+        resolverModalConfirmacion(resultado);
+        resolverModalConfirmacion = null;
+    }
+}
+
 function rellenarSelectoresHoras() {
     const inputs = [document.getElementById("inputHora"), document.getElementById("selectReagendaHora")];
     inputs.forEach(input => {
