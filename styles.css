@@ -238,6 +238,7 @@ svg {
 .layout {
   width: min(100%, 1280px);
   flex: 1;
+  min-height: 0;
   margin: 0 auto;
   padding: 24px;
   display: grid;
@@ -249,6 +250,7 @@ svg {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
 .panel,
@@ -442,8 +444,8 @@ svg {
   padding: 20px 24px 24px;
   display: flex;
   flex-direction: column;
-  overflow: visible;
   min-height: 0;
+  overflow: hidden;
 }
 
 .schedule-heading {
@@ -493,7 +495,10 @@ svg {
 }
 
 .schedule-scroll {
-  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--bg-page);
@@ -503,6 +508,7 @@ svg {
 
 .schedule-grid-shell {
   min-width: 0;
+  min-height: 100%;
 }
 
 .day-header-grid,
@@ -812,6 +818,36 @@ svg {
 }
 
 @media (max-width: 768px) {
+  .app-header {
+    padding: 12px;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .brand {
+    width: 100%;
+  }
+
+  .primary-action {
+    width: 100%;
+  }
+
+  .week-controls {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .week-label {
+    min-width: 0;
+    flex: 1 1 100%;
+    order: 3;
+    text-align: center;
+  }
+
   .layout {
     display: flex;
     flex-direction: column;
@@ -826,15 +862,25 @@ svg {
     width: 100%;
   }
 
+  .panel {
+    padding: 14px;
+  }
+
   .schedule-panel {
     width: 100%;
     padding: 12px;
+    overflow: visible;
   }
 
   .schedule-heading {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
     margin-bottom: 10px;
+  }
+
+  .schedule-heading > div:first-child {
+    min-width: 0;
   }
 
   .mobile-day-nav {
