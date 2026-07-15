@@ -813,17 +813,21 @@ svg {
 
 @media (max-width: 768px) {
   .layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     padding: 12px;
     gap: 12px;
   }
 
   .sidebar {
-    order: 2;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
+    width: 100%;
   }
 
   .schedule-panel {
+    width: 100%;
     padding: 12px;
   }
 
@@ -836,6 +840,16 @@ svg {
   .mobile-day-nav {
     display: flex;
     justify-content: center;
+  }
+
+  .schedule-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .schedule-grid-shell {
+    min-width: 320px;
   }
 
   .day-header-grid,
