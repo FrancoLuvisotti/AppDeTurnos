@@ -433,7 +433,7 @@ svg {
     padding: 20px 24px 24px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     min-height: 0;
 }
 
@@ -441,6 +441,7 @@ svg {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     margin-bottom: 16px;
 }
 
@@ -456,9 +457,34 @@ svg {
     font-size: 12px;
 }
 
+.mobile-day-nav {
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-nav-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--text-main);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.mobile-day-label {
+    min-width: 84px;
+    text-align: center;
+    color: var(--indigo-dark);
+    font-size: 12px;
+    font-weight: 800;
+}
+
 .schedule-scroll {
-    overflow: auto;
-    max-height: min(720px, calc(100vh - 220px));
+    overflow: visible;
     border: 1px solid var(--line);
     border-radius: 12px;
     background: var(--bg-page);
@@ -467,13 +493,13 @@ svg {
 }
 
 .schedule-grid-shell {
-    min-width: 850px;
+    min-width: 0;
 }
 
 .day-header-grid,
 .schedule-row {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: 60px repeat(7, minmax(0, 1fr));
 }
 
 .day-header-grid {
@@ -499,6 +525,10 @@ svg {
     justify-content: center;
     border-right: 1px solid var(--line);
     text-align: center;
+}
+
+.time-header {
+    min-width: 56px;
 }
 
 .time-header {
@@ -546,7 +576,7 @@ svg {
     position: sticky;
     left: 0;
     z-index: 10;
-    padding: 12px 4px;
+    padding: 8px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -555,7 +585,7 @@ svg {
     background: rgba(248, 250, 252, 0.95);
     color: var(--text-muted);
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 850;
 }
 
@@ -567,14 +597,14 @@ svg {
 
 .appointment-cell,
 .empty-cell {
-    min-height: 92px;
+    min-height: 84px;
     margin: 2px;
     border-radius: 8px;
 }
 
 .appointment-cell {
     position: relative;
-    padding: 8px;
+    padding: 7px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -619,7 +649,7 @@ svg {
     align-items: center;
     justify-content: space-between;
     gap: 4px;
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.2;
     font-weight: 850;
 }
@@ -643,7 +673,7 @@ svg {
     margin-top: 2px;
     overflow: hidden;
     color: #475569;
-    font-size: 9px;
+    font-size: 8px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -656,7 +686,7 @@ svg {
     justify-content: space-between;
     gap: 6px;
     color: #334155;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
 }
 
@@ -687,7 +717,7 @@ svg {
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.72);
     color: #334155;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
 }
 
@@ -705,7 +735,7 @@ svg {
     gap: 4px;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     color: var(--text-main);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 900;
 }
 
@@ -768,6 +798,90 @@ svg {
 .empty-cell-action svg {
     width: 14px;
     height: 14px;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .sidebar {
+        order: 2;
+        gap: 12px;
+    }
+
+    .schedule-panel {
+        padding: 12px;
+    }
+
+    .schedule-heading {
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 10px;
+    }
+
+    .mobile-day-nav {
+        display: flex;
+        justify-content: center;
+    }
+
+    .day-header-grid,
+    .schedule-row {
+        grid-template-columns: 52px repeat(3, minmax(0, 1fr));
+    }
+
+    .schedule-row {
+        min-height: 48px;
+    }
+
+    .time-header,
+    .day-header {
+        min-height: 38px;
+        padding: 0 2px;
+        font-size: 9px;
+    }
+
+    .time-header {
+        min-width: 48px;
+    }
+
+    .day-date {
+        font-size: 8px;
+    }
+
+    .time-cell {
+        padding: 6px 2px;
+        font-size: 9px;
+    }
+
+    .appointment-cell,
+    .empty-cell {
+        min-height: 62px;
+        margin: 1px;
+        padding: 4px;
+    }
+
+    .appointment-name {
+        font-size: 8px;
+    }
+
+    .appointment-phone,
+    .appointment-meta,
+    .appointment-history,
+    .appointment-footer {
+        font-size: 7px;
+    }
+
+    .appointment-history {
+        padding: 2px 4px;
+        gap: 2px;
+    }
+
+    .appointment-footer {
+        gap: 2px;
+    }
 }
 
 /* Modal */

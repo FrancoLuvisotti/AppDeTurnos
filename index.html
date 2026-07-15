@@ -111,6 +111,11 @@
                     <h2>Grilla Horaria</h2>
                     <p>Haz clic en una tarjeta reservada para gestionarla, marcar inasistencia o mover de semana.</p>
                 </div>
+                <div class="mobile-day-nav" id="mobileDayNav">
+                    <button type="button" class="mobile-nav-btn" id="btnDiaAnterior" aria-label="Día anterior">‹</button>
+                    <span id="mobileDayLabel" class="mobile-day-label">Hoy</span>
+                    <button type="button" class="mobile-nav-btn" id="btnDiaSiguiente" aria-label="Día siguiente">›</button>
+                </div>
             </div>
 
             <div class="schedule-scroll">
@@ -154,6 +159,11 @@
     </main>
 
     <div id="modalsMount"></div>
+    <script src="src/core/utils.js"></script>
+    <script src="src/core/state.js"></script>
+    <script src="src/services/storage.js"></script>
+    <script src="src/ui/ui.js"></script>
+    <script src="src/features/turnos/turno-logic.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
