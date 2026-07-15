@@ -3,4 +3,3 @@
 // La lógica real está separada en módulos bajo src/ para que sea más fácil mantenerla.
 fechaLunesActual = obtenerLunesDeSemana(new Date());
 document.addEventListener("DOMContentLoaded", iniciarApp);
-

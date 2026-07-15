@@ -1,161 +1,186 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de Turnos Premium</title>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <header class="app-header">
-        <div class="header-inner">
-            <div class="brand">
-                <div class="brand-icon">
-                    <i data-lucide="calendar-range"></i>
-                </div>
-                <div>
-                    <h1>TurneroPro <span class="version-pill">v3.5</span></h1>
-                    <p>16:00 a 00:00 hs - Control Historico de Senas</p>
-                </div>
-            </div>
-
-            <button onclick="abrirAgendarManual()" class="primary-action">
-                <i data-lucide="plus-circle"></i>
-                <span>Agregar Turno</span>
-            </button>
-
-            <div class="week-controls">
-                <button onclick="cambiarSemana(-1)" class="icon-button" title="Semana Anterior">
-                    <i data-lucide="chevron-left"></i>
-                </button>
-                <span id="labelSemana" class="week-label">Semana en curso</span>
-                <button onclick="cambiarSemana(1)" class="icon-button" title="Semana Siguiente">
-                    <i data-lucide="chevron-right"></i>
-                </button>
-                <button onclick="irSemanaActual()" class="today-button">Hoy</button>
-            </div>
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <i data-lucide="calendar-range"></i>
+          </div>
+          <div>
+            <h1>TurneroPro <span class="version-pill">v3.5</span></h1>
+            <p>16:00 a 00:00 hs - Control Historico de Senas</p>
+          </div>
         </div>
+
+        <button onclick="abrirAgendarManual()" class="primary-action">
+          <i data-lucide="plus-circle"></i>
+          <span>Agregar Turno</span>
+        </button>
+
+        <div class="week-controls">
+          <button
+            onclick="cambiarSemana(-1)"
+            class="icon-button"
+            title="Semana Anterior">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <span id="labelSemana" class="week-label">Semana en curso</span>
+          <button
+            onclick="cambiarSemana(1)"
+            class="icon-button"
+            title="Semana Siguiente">
+            <i data-lucide="chevron-right"></i>
+          </button>
+          <button onclick="irSemanaActual()" class="today-button">Hoy</button>
+        </div>
+      </div>
     </header>
 
     <main class="layout">
-        <aside class="sidebar">
-            <section class="panel">
-                <h3 class="panel-title">
-                    <i data-lucide="bar-chart-3"></i>
-                    Turnos de esta Semana
-                </h3>
-                <div class="stats-grid">
-                    <div class="stat-card stat-warning">
-                        <div class="stat-label">Sin Sena</div>
-                        <div id="statSinSena" class="stat-number">0</div>
-                    </div>
-                    <div class="stat-card stat-success">
-                        <div class="stat-label">Con Sena</div>
-                        <div id="statConSena" class="stat-number">0</div>
-                    </div>
-                    <div class="stat-card stat-danger stat-wide">
-                        <div class="stat-row">
-                            <span class="stat-label">Faltaron en la semana</span>
-                            <span id="statFaltaron" class="stat-number stat-inline">0</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="panel">
-                <h3 class="panel-title">Referencia de Estados</h3>
-                <div class="legend">
-                    <div class="legend-item">
-                        <span class="legend-dot legend-warning"></span>
-                        <div>
-                            <p>Sin sena ($0)</p>
-                            <small>Se muestra en color amarillo.</small>
-                        </div>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot legend-success"></span>
-                        <div>
-                            <p>Con sena ($ &gt; 0)</p>
-                            <small>Se muestra en color verde.</small>
-                        </div>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot legend-danger"></span>
-                        <div>
-                            <p>Falto (Ausente)</p>
-                            <small>Se cambia a color rojo al marcar la falta.</small>
-                        </div>
-                    </div>
-                    <div class="legend-item legend-fixed">
-                        <span class="legend-pin">
-                            <i data-lucide="pin"></i>
-                        </span>
-                        <div>
-                            <p>Turno Fijo</p>
-                            <small>Se repite todas las semanas proximas.</small>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="maintenance">
-                <p>Los datos se almacenan de manera local y privada en tu dispositivo.</p>
-                <button onclick="limpiarTodo()">Restablecer Turnero y Clientes</button>
-            </section>
-        </aside>
-
-        <section class="schedule-panel">
-            <div class="schedule-heading">
-                <div>
-                    <h2>Grilla Horaria</h2>
-                    <p>Haz clic en una tarjeta reservada para gestionarla, marcar inasistencia o mover de semana.</p>
-                </div>
-                <div class="mobile-day-nav" id="mobileDayNav">
-                    <button type="button" class="mobile-nav-btn" id="btnDiaAnterior" aria-label="Día anterior">‹</button>
-                    <span id="mobileDayLabel" class="mobile-day-label">Hoy</span>
-                    <button type="button" class="mobile-nav-btn" id="btnDiaSiguiente" aria-label="Día siguiente">›</button>
-                </div>
+      <aside class="sidebar">
+        <section class="panel">
+          <h3 class="panel-title">
+            <i data-lucide="bar-chart-3"></i>
+            Turnos de esta Semana
+          </h3>
+          <div class="stats-grid">
+            <div class="stat-card stat-warning">
+              <div class="stat-label">Sin Sena</div>
+              <div id="statSinSena" class="stat-number">0</div>
             </div>
-
-            <div class="schedule-scroll">
-                <div class="schedule-grid-shell">
-                    <div class="day-header-grid">
-                        <div class="time-header">Hora</div>
-                        <div class="day-header">
-                            <div>Lunes</div>
-                            <div id="fecha-0" class="day-date"></div>
-                        </div>
-                        <div class="day-header">
-                            <div>Martes</div>
-                            <div id="fecha-1" class="day-date"></div>
-                        </div>
-                        <div class="day-header">
-                            <div>Miercoles</div>
-                            <div id="fecha-2" class="day-date"></div>
-                        </div>
-                        <div class="day-header">
-                            <div>Jueves</div>
-                            <div id="fecha-3" class="day-date"></div>
-                        </div>
-                        <div class="day-header">
-                            <div>Viernes</div>
-                            <div id="fecha-4" class="day-date"></div>
-                        </div>
-                        <div class="day-header day-saturday">
-                            <div>Sabado</div>
-                            <div id="fecha-5" class="day-date"></div>
-                        </div>
-                        <div class="day-header day-sunday">
-                            <div>Domingo</div>
-                            <div id="fecha-6" class="day-date"></div>
-                        </div>
-                    </div>
-
-                    <div id="contenedorFilas" class="schedule-rows"></div>
-                </div>
+            <div class="stat-card stat-success">
+              <div class="stat-label">Con Sena</div>
+              <div id="statConSena" class="stat-number">0</div>
             </div>
+            <div class="stat-card stat-danger stat-wide">
+              <div class="stat-row">
+                <span class="stat-label">Faltaron en la semana</span>
+                <span id="statFaltaron" class="stat-number stat-inline">0</span>
+              </div>
+            </div>
+          </div>
         </section>
+
+        <section class="panel">
+          <h3 class="panel-title">Referencia de Estados</h3>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-dot legend-warning"></span>
+              <div>
+                <p>Sin sena ($0)</p>
+                <small>Se muestra en color amarillo.</small>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot legend-success"></span>
+              <div>
+                <p>Con sena ($ &gt; 0)</p>
+                <small>Se muestra en color verde.</small>
+              </div>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot legend-danger"></span>
+              <div>
+                <p>Falto (Ausente)</p>
+                <small>Se cambia a color rojo al marcar la falta.</small>
+              </div>
+            </div>
+            <div class="legend-item legend-fixed">
+              <span class="legend-pin">
+                <i data-lucide="pin"></i>
+              </span>
+              <div>
+                <p>Turno Fijo</p>
+                <small>Se repite todas las semanas proximas.</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="maintenance">
+          <p>
+            Los datos se almacenan de manera local y privada en tu dispositivo.
+          </p>
+          <button onclick="limpiarTodo()">
+            Restablecer Turnero y Clientes
+          </button>
+        </section>
+      </aside>
+
+      <section class="schedule-panel">
+        <div class="schedule-heading">
+          <div>
+            <h2>Grilla Horaria</h2>
+            <p>
+              Haz clic en una tarjeta reservada para gestionarla, marcar
+              inasistencia o mover de semana.
+            </p>
+          </div>
+          <div class="mobile-day-nav" id="mobileDayNav">
+            <button
+              type="button"
+              class="mobile-nav-btn"
+              id="btnDiaAnterior"
+              aria-label="Día anterior">
+              ‹
+            </button>
+            <span id="mobileDayLabel" class="mobile-day-label">Hoy</span>
+            <button
+              type="button"
+              class="mobile-nav-btn"
+              id="btnDiaSiguiente"
+              aria-label="Día siguiente">
+              ›
+            </button>
+          </div>
+        </div>
+
+        <div class="schedule-scroll">
+          <div class="schedule-grid-shell">
+            <div class="day-header-grid">
+              <div class="time-header">Hora</div>
+              <div class="day-header">
+                <div>Lunes</div>
+                <div id="fecha-0" class="day-date"></div>
+              </div>
+              <div class="day-header">
+                <div>Martes</div>
+                <div id="fecha-1" class="day-date"></div>
+              </div>
+              <div class="day-header">
+                <div>Miercoles</div>
+                <div id="fecha-2" class="day-date"></div>
+              </div>
+              <div class="day-header">
+                <div>Jueves</div>
+                <div id="fecha-3" class="day-date"></div>
+              </div>
+              <div class="day-header">
+                <div>Viernes</div>
+                <div id="fecha-4" class="day-date"></div>
+              </div>
+              <div class="day-header day-saturday">
+                <div>Sabado</div>
+                <div id="fecha-5" class="day-date"></div>
+              </div>
+              <div class="day-header day-sunday">
+                <div>Domingo</div>
+                <div id="fecha-6" class="day-date"></div>
+              </div>
+            </div>
+
+            <div id="contenedorFilas" class="schedule-rows"></div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <div id="modalsMount"></div>
@@ -165,5 +190,5 @@
     <script src="src/ui/ui.js"></script>
     <script src="src/features/turnos/turno-logic.js"></script>
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
