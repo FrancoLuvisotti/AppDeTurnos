@@ -9,6 +9,7 @@ function cargarDatos() {
     try {
       turnos = JSON.parse(guardadoTurnos);
       clientesDB = JSON.parse(guardadoClientes);
+      normalizarHistorialTurnos();
     } catch (e) {
       turnos = [];
       clientesDB = {};
@@ -44,6 +45,35 @@ function guardarDatos() {
   localStorage.setItem("turnero_datos_v4_clientes", JSON.stringify(clientesDB));
 }
 
+function normalizarHistorialTurnos() {
+  turnos.forEach((turno) => {
+    if (turno.jugoContabilizado === undefined) {
+      turno.jugoContabilizado = turno.falto ? false : turnoYaOcurrio(turno);
+      if (!turno.jugoContabilizado && !turno.falto) {
+        asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 0);
+      }
+    }
+
+    sincronizarJugadaTurno(turno);
+  });
+  guardarDatos();
+}
+
+function sincronizarJugadaTurno(turno) {
+  const debeContar = !turno.falto && turnoYaOcurrio(turno);
+  const yaContada = turno.jugoContabilizado === true;
+
+  if (debeContar !== yaContada) {
+    asegurarRegistroCliente(
+      turno.telefono,
+      turno.nombre,
+      debeContar ? 1 : -1,
+      0,
+    );
+  }
+  turno.jugoContabilizado = debeContar;
+}
+
 function turnoFijoActivoEnSemana(turno, fechaSemanaRef) {
   // Determina si un turno fijo debe mostrarse en una semana concreta.
   if (!turno || turno.fijo !== true) return false;
@@ -74,6 +104,7 @@ function crearRegistroFaltaDeFijo(turnoFijo, fechaSemanaRef) {
     fechaSemanaRef,
     origenFijoId: turnoFijo.id,
     excepcionesCanceladas: [],
+    jugoContabilizado: false,
   };
 }
 

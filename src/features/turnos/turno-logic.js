@@ -124,11 +124,12 @@ function guardarTurno(e) {
         dia,
         hora,
       };
+      asegurarRegistroCliente(telefono, nombre, 0, 0);
+      sincronizarJugadaTurno(turnos[idx]);
       showToast("Turno editado correctamente.");
     }
   } else {
-    asegurarRegistroCliente(telefono, nombre, 1, 0);
-    turnos.push({
+    const nuevoTurno = {
       id: "turno-" + Date.now(),
       nombre,
       telefono,
@@ -142,7 +143,11 @@ function guardarTurno(e) {
       hora,
       fechaSemanaRef: semanaId,
       excepcionesCanceladas: [],
-    });
+      jugoContabilizado: false,
+    };
+    asegurarRegistroCliente(telefono, nombre, 0, 0);
+    sincronizarJugadaTurno(nuevoTurno);
+    turnos.push(nuevoTurno);
     showToast("¡Turno agendado!");
   }
   guardarDatos();
@@ -226,7 +231,13 @@ function toggleFalta() {
       }
 
       turno.fechaUltimaSemanaFijo = semanaIdActual;
-      asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 1);
+      asegurarRegistroCliente(
+        turno.telefono,
+        turno.nombre,
+        turno.jugoContabilizado ? -1 : 0,
+        1,
+      );
+      turno.jugoContabilizado = false;
       showToast(
         "Falta registrada. El turno fijo deja de repetirse en las semanas proximas.",
       );
@@ -248,9 +259,10 @@ function toggleFalta() {
       asegurarRegistroCliente(
         turno.telefono,
         turno.nombre,
-        turno.falto ? -1 : 1,
+        0,
         turno.falto ? 1 : -1,
       );
+      sincronizarJugadaTurno(turno);
       if (estabaFalto && turno.origenFijoId) {
         showToast("Falta revertida. El turno fijo vuelve a repetirse.");
       }
@@ -326,10 +338,12 @@ function ejecutarMoverPagado() {
     hora: horaDestino,
     fechaSemanaRef: semanaDestino,
     excepcionesCanceladas: [],
+    jugoContabilizado: false,
   };
 
   turnos.push(nuevoTurnoDestino);
-  asegurarRegistroCliente(turnoOrigen.telefono, turnoOrigen.nombre, 1, 0);
+  asegurarRegistroCliente(turnoOrigen.telefono, turnoOrigen.nombre, 0, 0);
+  sincronizarJugadaTurno(nuevoTurnoDestino);
 
   guardarDatos();
   cerrarModalOpciones();
@@ -339,7 +353,6 @@ function ejecutarMoverPagado() {
 }
 
 function eliminarDesdeOpcionesAnterior() {
-  // Elimina un turno o anula solo una semana de un turno fijo según el contexto.
   const semanaIdActual = formatearFechaID(fechaLunesActual);
   let turno = turnos.find((t) => t.id === idTurnoSeleccionado);
 

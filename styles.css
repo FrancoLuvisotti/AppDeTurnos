@@ -510,59 +510,6 @@ body.history-view .week-controls {
   height: 16px;
 }
 
-.history-summary {
-  margin: 18px 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.history-summary-card {
-  padding: 18px 20px;
-  border: 1px solid var(--line-soft);
-  border-radius: 14px;
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-soft);
-}
-
-.history-summary-card span {
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.history-summary-card strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 28px;
-  line-height: 1;
-}
-
-.history-summary-total {
-  border-top: 3px solid var(--indigo);
-}
-
-.history-summary-total strong {
-  color: var(--indigo-dark);
-}
-
-.history-summary-played {
-  border-top: 3px solid var(--emerald);
-}
-
-.history-summary-played strong {
-  color: var(--emerald-dark);
-}
-
-.history-summary-missed {
-  border-top: 3px solid var(--rose);
-}
-
-.history-summary-missed strong {
-  color: var(--rose-dark);
-}
-
 .history-list-panel {
   padding: 22px;
   border: 1px solid var(--line-soft);
@@ -2017,15 +1964,6 @@ select:focus {
   .back-grid-button {
     width: 100%;
     justify-content: center;
-  }
-
-  .history-summary {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .history-summary-card {
-    padding: 14px 16px;
   }
 
   .history-list-panel {

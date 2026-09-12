@@ -26,3 +26,14 @@ function formatearFechaID(fechaObj) {
   const dd = String(fechaObj.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
+
+function turnoYaOcurrio(turno, ahora = new Date()) {
+  if (!turno?.fechaSemanaRef || turno.dia === undefined || !turno.hora)
+    return false;
+
+  const fechaTurno = new Date(`${turno.fechaSemanaRef}T00:00:00`);
+  fechaTurno.setDate(fechaTurno.getDate() + turno.dia);
+  const [horas, minutos] = turno.hora.split(":").map(Number);
+  fechaTurno.setHours(horas, minutos, 0, 0);
+  return fechaTurno <= ahora;
+}

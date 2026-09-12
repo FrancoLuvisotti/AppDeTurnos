@@ -422,6 +422,7 @@ function renderizarHistorialClientes() {
   const contenedor = document.getElementById("historialClientes");
   if (!contenedor) return;
 
+  normalizarHistorialTurnos();
   contenedor.innerHTML = "";
   const clientes = Object.entries(clientesDB).sort(
     ([, clienteA], [, clienteB]) =>
@@ -430,21 +431,6 @@ function renderizarHistorialClientes() {
         "es",
       ),
   );
-
-  const totalJugo = clientes.reduce(
-    (total, [, cliente]) => total + (cliente.jugo || 0),
-    0,
-  );
-  const totalFalto = clientes.reduce(
-    (total, [, cliente]) => total + (cliente.falto || 0),
-    0,
-  );
-  const totalClientes = document.getElementById("historialTotalClientes");
-  const totalJugoEl = document.getElementById("historialTotalJugo");
-  const totalFaltoEl = document.getElementById("historialTotalFalto");
-  if (totalClientes) totalClientes.textContent = clientes.length;
-  if (totalJugoEl) totalJugoEl.textContent = totalJugo;
-  if (totalFaltoEl) totalFaltoEl.textContent = totalFalto;
 
   if (!clientes.length) {
     const vacio = document.createElement("p");
