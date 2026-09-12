@@ -73,6 +73,23 @@ function manejarCambioVista() {
   renderizarGrilla();
 }
 
+function mostrarHistorial() {
+  renderizarHistorialClientes();
+  document.getElementById("mainGrilla")?.classList.add("hidden");
+  document.getElementById("mainHistorial")?.classList.remove("hidden");
+  document.body.classList.add("history-view");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  ejecutarIconos();
+}
+
+function mostrarGrilla() {
+  document.getElementById("mainHistorial")?.classList.add("hidden");
+  document.getElementById("mainGrilla")?.classList.remove("hidden");
+  document.body.classList.remove("history-view");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  ejecutarIconos();
+}
+
 async function cargarModales() {
   // Carga los modales externos desde modals.html para mantener el HTML principal más limpio.
   const mount = document.getElementById("modalsMount");
@@ -136,6 +153,13 @@ async function iniciarApp() {
       return;
     }
   });
+
+  document
+    .getElementById("historialClientes")
+    ?.addEventListener("click", (e) => {
+      const boton = e.target.closest(".client-history-delete");
+      if (boton) eliminarHistorialCliente(boton.dataset.telefono);
+    });
 }
 
 function ejecutarIconos() {
@@ -391,6 +415,84 @@ function actualizarEstadisticas() {
     document.getElementById("statConSena").textContent = conSena;
   if (document.getElementById("statFaltaron"))
     document.getElementById("statFaltaron").textContent = faltaron;
+  renderizarHistorialClientes();
+}
+
+function renderizarHistorialClientes() {
+  const contenedor = document.getElementById("historialClientes");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+  const clientes = Object.entries(clientesDB).sort(([, clienteA], [, clienteB]) =>
+    String(clienteA.nombre || "").localeCompare(
+      String(clienteB.nombre || ""),
+      "es",
+    ),
+  );
+
+  const totalJugo = clientes.reduce(
+    (total, [, cliente]) => total + (cliente.jugo || 0),
+    0,
+  );
+  const totalFalto = clientes.reduce(
+    (total, [, cliente]) => total + (cliente.falto || 0),
+    0,
+  );
+  const totalClientes = document.getElementById("historialTotalClientes");
+  const totalJugoEl = document.getElementById("historialTotalJugo");
+  const totalFaltoEl = document.getElementById("historialTotalFalto");
+  if (totalClientes) totalClientes.textContent = clientes.length;
+  if (totalJugoEl) totalJugoEl.textContent = totalJugo;
+  if (totalFaltoEl) totalFaltoEl.textContent = totalFalto;
+
+  if (!clientes.length) {
+    const vacio = document.createElement("p");
+    vacio.className = "client-history-empty";
+    vacio.textContent = "Todavia no hay clientes con historial.";
+    contenedor.appendChild(vacio);
+    return;
+  }
+
+  clientes.forEach(([telefono, cliente]) => {
+    const item = document.createElement("article");
+    item.className = "client-history-item";
+
+    const principal = document.createElement("div");
+    principal.className = "client-history-main";
+
+    const nombre = document.createElement("div");
+    nombre.className = "client-history-name";
+    nombre.textContent = cliente.nombre || "Cliente sin nombre";
+
+    const telefonoEl = document.createElement("div");
+    telefonoEl.className = "client-history-phone";
+    telefonoEl.textContent = `Tel: ${telefono}`;
+
+    const contadores = document.createElement("div");
+    contadores.className = "client-history-counts";
+    contadores.innerHTML = `
+      <span class="client-history-count played">Jugo: ${cliente.jugo || 0}</span>
+      <span class="client-history-count missed">Falto: ${cliente.falto || 0}</span>
+    `;
+
+    principal.append(nombre, telefonoEl, contadores);
+
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "client-history-delete";
+    boton.title = "Eliminar historial de este cliente";
+    boton.setAttribute(
+      "aria-label",
+      `Eliminar historial de ${cliente.nombre || telefono}`,
+    );
+    boton.dataset.telefono = telefono;
+    boton.innerHTML = '<i data-lucide="trash-2"></i>';
+
+    item.append(principal, boton);
+    contenedor.appendChild(item);
+  });
+
+  ejecutarIconos();
 }
 
 function actualizarAlertaHistorial() {

@@ -180,6 +180,27 @@ function cerrarModalOpciones() {
   document.getElementById("modalOpciones").classList.add("hidden");
 }
 
+async function eliminarHistorialCliente(telefono) {
+  const cliente = clientesDB[telefono];
+  if (!cliente) return;
+
+  const confirmado = await abrirModalConfirmacion({
+    titulo: "Eliminar historial",
+    subtitulo: "Se borraran los contadores de este cliente",
+    mensaje: `Se eliminara el historial de ${cliente.nombre || telefono}. Sus turnos y reservas no se modificaran.`,
+    cancelar: "Conservar historial",
+    aceptar: "Eliminar historial",
+    icono: "trash-2",
+    peligro: true,
+  });
+  if (!confirmado) return;
+
+  delete clientesDB[telefono];
+  guardarDatos();
+  renderizarHistorialClientes();
+  showToast("Historial eliminado.");
+}
+
 function toggleFalta() {
   // Marca o desmarca la falta de un turno y ajusta el historial y las reglas del turno fijo.
   const semanaIdActual = formatearFechaID(fechaLunesActual);

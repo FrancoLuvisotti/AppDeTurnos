@@ -25,6 +25,11 @@
           <span>Agregar Turno</span>
         </button>
 
+        <button onclick="mostrarHistorial()" class="history-nav-action">
+          <i data-lucide="history"></i>
+          <span>Historial</span>
+        </button>
+
         <div class="week-controls">
           <button
             onclick="cambiarSemana(-1)"
@@ -44,7 +49,7 @@
       </div>
     </header>
 
-    <main class="layout">
+    <main id="mainGrilla" class="layout">
       <aside class="sidebar">
         <section class="panel">
           <h3 class="panel-title">
@@ -187,6 +192,49 @@
             <div id="contenedorFilas" class="schedule-rows"></div>
           </div>
         </div>
+      </section>
+    </main>
+
+    <main id="mainHistorial" class="history-page hidden">
+      <section class="history-page-heading">
+        <div>
+          <span class="history-eyebrow">Registro permanente</span>
+          <h2>Historial de clientes</h2>
+          <p>
+            Consulta el rendimiento de cada cliente y administra sus registros
+            acumulados en un solo lugar.
+          </p>
+        </div>
+        <button onclick="mostrarGrilla()" class="back-grid-button">
+          <i data-lucide="arrow-left"></i>
+          <span>Volver a la grilla</span>
+        </button>
+      </section>
+
+      <section class="history-summary" aria-label="Resumen del historial">
+        <div class="history-summary-card history-summary-total">
+          <span>Clientes registrados</span>
+          <strong id="historialTotalClientes">0</strong>
+        </div>
+        <div class="history-summary-card history-summary-played">
+          <span>Turnos jugados</span>
+          <strong id="historialTotalJugo">0</strong>
+        </div>
+        <div class="history-summary-card history-summary-missed">
+          <span>Faltas acumuladas</span>
+          <strong id="historialTotalFalto">0</strong>
+        </div>
+      </section>
+
+      <section class="history-list-panel">
+        <div class="history-list-heading">
+          <div>
+            <h3>Clientes</h3>
+            <p>Cada registro conserva sus jugadas y faltas.</p>
+          </div>
+          <i data-lucide="users-round"></i>
+        </div>
+        <div id="historialClientes" class="client-history-list"></div>
       </section>
     </main>
 
