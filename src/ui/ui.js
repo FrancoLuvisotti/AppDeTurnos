@@ -423,11 +423,12 @@ function renderizarHistorialClientes() {
   if (!contenedor) return;
 
   contenedor.innerHTML = "";
-  const clientes = Object.entries(clientesDB).sort(([, clienteA], [, clienteB]) =>
-    String(clienteA.nombre || "").localeCompare(
-      String(clienteB.nombre || ""),
-      "es",
-    ),
+  const clientes = Object.entries(clientesDB).sort(
+    ([, clienteA], [, clienteB]) =>
+      String(clienteA.nombre || "").localeCompare(
+        String(clienteB.nombre || ""),
+        "es",
+      ),
   );
 
   const totalJugo = clientes.reduce(
