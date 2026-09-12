@@ -295,11 +295,15 @@ function renderizarGrilla() {
           const hist = obtenerHistorialCliente(turno.telefono);
           let statusClass = turno.falto
             ? "status-absence"
-            : turno.torneo
-              ? "status-tournament"
-              : turno.sena > 0
-                ? "status-paid"
-                : "status-unpaid";
+            : turno.usaQuincho && turno.sena > 0
+              ? "status-quincho-paid"
+              : turno.usaQuincho
+                ? "status-unpaid"
+                : turno.torneo
+                  ? "status-tournament"
+                  : turno.sena > 0
+                    ? "status-paid"
+                    : "status-unpaid";
           const fechaReserva = obtenerFechaTurnoLabel(
             turno.fechaSemanaRefActual || turno.fechaSemanaRef || semanaId,
             turno.dia,
@@ -334,6 +338,10 @@ function renderizarGrilla() {
                             <span>$${(turno.sena || 0).toLocaleString("es-AR")}</span>
                             <span class="appointment-badge">${turno.falto ? "FALTÓ" : turno.sena > 0 ? "SEÑA" : "S/SEÑA"}</span>
                         </div>`}
+                        ${turno.usaQuincho ? `<div class="appointment-quincho">
+                          <span>Usa quincho</span>
+                          <strong>$${(turno.senaQuincho || 0).toLocaleString("es-AR")}</strong>
+                        </div>` : ""}
                     `;
         } else {
           celdaDia.setAttribute("data-dia", dia);

@@ -60,6 +60,14 @@
                     </div>
                 </div>
 
+                <div id="campoSenaQuincho" class="hidden">
+                    <label>Seña del Quincho ($ Pesos)</label>
+                    <div class="field-with-prefix">
+                        <span>$</span>
+                        <input type="number" id="inputSenaQuincho" min="0" value="0" placeholder="0">
+                    </div>
+                </div>
+
                 <div class="turno-toggles">
                     <label class="toggle-label">
                         <input type="checkbox" id="inputFijo">
@@ -70,6 +78,11 @@
                         <input type="checkbox" id="inputTorneo" onchange="actualizarFormularioTorneo()">
                         <span class="toggle-ui"></span>
                         <span>Torneo</span>
+                    </label>
+                    <label class="toggle-label quincho-toggle">
+                        <input type="checkbox" id="inputUsaQuincho" onchange="actualizarFormularioQuincho()">
+                        <span class="toggle-ui"></span>
+                        <span>Usa quincho</span>
                     </label>
                 </div>
             </div>

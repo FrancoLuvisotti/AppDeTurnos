@@ -26,9 +26,12 @@ function abrirAgendarNuevo(dia, hora) {
   document.getElementById("inputNombre").value = "";
   document.getElementById("inputTelefono").value = "";
   document.getElementById("inputSena").value = 0;
+  document.getElementById("inputSenaQuincho").value = 0;
   document.getElementById("inputFijo").checked = false;
   document.getElementById("inputTorneo").checked = false;
+  document.getElementById("inputUsaQuincho").checked = false;
   actualizarFormularioTorneo();
+  actualizarFormularioQuincho();
   document.getElementById("alertaInasistencia").className = "hidden";
   document.getElementById("btnEliminar").classList.add("hidden");
   document.getElementById("modalTurno").classList.remove("hidden");
@@ -58,6 +61,18 @@ function actualizarFormularioTorneo() {
   }
 }
 
+function actualizarFormularioQuincho() {
+  const usaQuincho = document.getElementById("inputUsaQuincho")?.checked;
+  const campoSenaQuincho = document.getElementById("campoSenaQuincho");
+  const inputSenaQuincho = document.getElementById("inputSenaQuincho");
+
+  if (campoSenaQuincho) campoSenaQuincho.classList.toggle("hidden", !usaQuincho);
+  if (inputSenaQuincho) {
+    inputSenaQuincho.disabled = !usaQuincho;
+    if (!usaQuincho) inputSenaQuincho.value = 0;
+  }
+}
+
 function guardarTurno(e) {
   // Guarda un turno nuevo o actualiza uno existente desde el formulario.
   e.preventDefault();
@@ -70,6 +85,10 @@ function guardarTurno(e) {
   const sena = torneo
     ? 0
     : parseFloat(document.getElementById("inputSena").value) || 0;
+  const usaQuincho = document.getElementById("inputUsaQuincho").checked;
+  const senaQuincho = usaQuincho
+    ? parseFloat(document.getElementById("inputSenaQuincho").value) || 0
+    : 0;
   const fijo = document.getElementById("inputFijo").checked;
   const semanaId = formatearFechaID(fechaLunesActual);
   if (fijo) {
@@ -96,6 +115,8 @@ function guardarTurno(e) {
         nombre,
         telefono,
         sena,
+        usaQuincho,
+        senaQuincho,
         fijo,
         torneo,
         dia,
@@ -110,6 +131,8 @@ function guardarTurno(e) {
       nombre,
       telefono,
       sena,
+      usaQuincho,
+      senaQuincho,
       fijo,
       torneo,
       falto: false,
@@ -272,6 +295,8 @@ function ejecutarMoverPagado() {
     nombre: turnoOrigen.nombre,
     telefono: turnoOrigen.telefono,
     sena: senaDestino,
+    usaQuincho: turnoOrigen.usaQuincho === true,
+    senaQuincho: turnoOrigen.senaQuincho || 0,
     fijo: false,
     torneo: turnoOrigen.torneo === true,
     falto: false,
@@ -373,9 +398,12 @@ function abrirEditarDesdeOpciones() {
     document.getElementById("inputNombre").value = t.nombre;
     document.getElementById("inputTelefono").value = t.telefono;
     document.getElementById("inputSena").value = t.sena;
+    document.getElementById("inputSenaQuincho").value = t.senaQuincho || 0;
     document.getElementById("inputFijo").checked = t.fijo;
     document.getElementById("inputTorneo").checked = t.torneo === true;
+    document.getElementById("inputUsaQuincho").checked = t.usaQuincho === true;
     actualizarFormularioTorneo();
+    actualizarFormularioQuincho();
     document.getElementById("btnEliminar").classList.remove("hidden");
     document.getElementById("modalTurno").classList.remove("hidden");
     actualizarAlertaHistorial();

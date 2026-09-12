@@ -640,6 +640,12 @@ svg {
   color: #064e3b;
 }
 
+.status-quincho-paid {
+  background: #86efac;
+  border-color: #16a34a;
+  color: #14532d;
+}
+
 .status-unpaid {
   background: #fef3c7;
   border-color: #fcd34d;
@@ -778,12 +784,36 @@ svg {
   background: #a7f3d0;
 }
 
+.status-quincho-paid .appointment-badge {
+  background: #4ade80;
+  color: #14532d;
+}
+
 .status-unpaid .appointment-badge {
   background: #fde68a;
 }
 
 .status-absence .appointment-badge {
   background: #fecdd3;
+}
+
+.appointment-quincho {
+  width: 100%;
+  margin-top: 4px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.76);
+  color: currentColor;
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.appointment-quincho strong {
+  font-size: 9px;
 }
 
 .empty-cell {
@@ -1255,6 +1285,14 @@ select:focus {
   box-shadow:
     inset 0 1px 3px rgba(8, 47, 73, 0.18),
     0 0 0 3px rgba(8, 145, 178, 0.13);
+}
+
+.quincho-toggle input:checked + .toggle-ui {
+  background: #16a34a;
+  border-color: #15803d;
+  box-shadow:
+    inset 0 1px 3px rgba(20, 83, 45, 0.18),
+    0 0 0 3px rgba(22, 163, 74, 0.13);
 }
 
 .history-alert {
