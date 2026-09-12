@@ -54,7 +54,8 @@ function actualizarFormularioTorneo() {
   const inputSena = document.getElementById("inputSena");
 
   if (campoSena) campoSena.classList.toggle("hidden", esTorneo);
-  if (configuracion) configuracion.classList.toggle("tournament-mode", esTorneo);
+  if (configuracion)
+    configuracion.classList.toggle("tournament-mode", esTorneo);
   if (inputSena) {
     inputSena.disabled = esTorneo;
     if (esTorneo) inputSena.value = 0;
@@ -66,7 +67,8 @@ function actualizarFormularioQuincho() {
   const campoSenaQuincho = document.getElementById("campoSenaQuincho");
   const inputSenaQuincho = document.getElementById("inputSenaQuincho");
 
-  if (campoSenaQuincho) campoSenaQuincho.classList.toggle("hidden", !usaQuincho);
+  if (campoSenaQuincho)
+    campoSenaQuincho.classList.toggle("hidden", !usaQuincho);
   if (inputSenaQuincho) {
     inputSenaQuincho.disabled = !usaQuincho;
     if (!usaQuincho) inputSenaQuincho.value = 0;
@@ -161,10 +163,9 @@ function abrirOpcionesTurno(turno) {
     ? "Torneo"
     : `$ ${turno.sena}`;
   document.getElementById("inputSenaTraspaso").value = turno.sena;
-  document.getElementById("transferBox").classList.toggle(
-    "hidden",
-    turno.torneo === true,
-  );
+  document
+    .getElementById("transferBox")
+    .classList.toggle("hidden", turno.torneo === true);
 
   const hist = obtenerHistorialCliente(turno.telefono);
   document.getElementById("historialJugo").textContent = `${hist.jugo} veces`;
@@ -505,7 +506,8 @@ async function limpiarTodo() {
   const confirmado = await abrirModalConfirmacion({
     titulo: "Restablecer turnero",
     subtitulo: "Se borraran los turnos y clientes guardados",
-    mensaje: "Esta accion elimina todos los datos locales y no se puede deshacer.",
+    mensaje:
+      "Esta accion elimina todos los datos locales y no se puede deshacer.",
     cancelar: "Cancelar",
     aceptar: "Borrar todo",
     icono: "rotate-ccw",

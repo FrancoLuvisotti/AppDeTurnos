@@ -86,17 +86,15 @@ function sumarSemanaAId(fechaSemanaRef) {
 function turnoFijoSeSuperponeDesde(turno, fechaSemanaInicio) {
   if (!turno.fijo) return turno.fechaSemanaRef >= fechaSemanaInicio;
 
-  let semana = turno.fechaSemanaRef > fechaSemanaInicio
-    ? turno.fechaSemanaRef
-    : fechaSemanaInicio;
+  let semana =
+    turno.fechaSemanaRef > fechaSemanaInicio
+      ? turno.fechaSemanaRef
+      : fechaSemanaInicio;
   const excepciones = turno.excepcionesCanceladas || [];
 
   // Solo hay que revisar las semanas canceladas consecutivas: la siguiente libre se superpone.
   for (let intento = 0; intento <= excepciones.length; intento++) {
-    if (
-      turno.fechaUltimaSemanaFijo &&
-      semana > turno.fechaUltimaSemanaFijo
-    ) {
+    if (turno.fechaUltimaSemanaFijo && semana > turno.fechaUltimaSemanaFijo) {
       return false;
     }
     if (turnoFijoActivoEnSemana(turno, semana)) return true;

@@ -334,14 +334,22 @@ function renderizarGrilla() {
                             <span>Jugó: ${hist.jugo}</span>
                             <span>Faltó: ${hist.falto}</span>
                         </div>
-                        ${turno.torneo ? "" : `<div class="appointment-footer">
+                        ${
+                          turno.torneo
+                            ? ""
+                            : `<div class="appointment-footer">
                             <span>$${(turno.sena || 0).toLocaleString("es-AR")}</span>
                             <span class="appointment-badge">${turno.falto ? "FALTÓ" : turno.sena > 0 ? "SEÑA" : "S/SEÑA"}</span>
-                        </div>`}
-                        ${turno.usaQuincho ? `<div class="appointment-quincho">
+                        </div>`
+                        }
+                        ${
+                          turno.usaQuincho
+                            ? `<div class="appointment-quincho">
                           <span>Usa quincho</span>
                           <strong>$${(turno.senaQuincho || 0).toLocaleString("es-AR")}</strong>
-                        </div>` : ""}
+                        </div>`
+                            : ""
+                        }
                     `;
         } else {
           celdaDia.setAttribute("data-dia", dia);
