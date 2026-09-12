@@ -151,7 +151,9 @@ function abrirModalConfirmacion(opciones = {}) {
   const titulo = document.getElementById("confirmTitulo");
   const subtitulo = document.getElementById("confirmSubtitulo");
   const mensaje = document.getElementById("confirmMensaje");
+  const icono = document.getElementById("confirmIcon");
   const btnCancelar = document.getElementById("btnConfirmCancelar");
+  const btnAlternativa = document.getElementById("btnConfirmAlternativa");
   const btnAceptar = document.getElementById("btnConfirmAceptar");
 
   if (
@@ -159,7 +161,9 @@ function abrirModalConfirmacion(opciones = {}) {
     !titulo ||
     !subtitulo ||
     !mensaje ||
+    !icono ||
     !btnCancelar ||
+    !btnAlternativa ||
     !btnAceptar
   ) {
     return Promise.resolve(false);
@@ -168,7 +172,10 @@ function abrirModalConfirmacion(opciones = {}) {
   titulo.textContent = opciones.titulo || "Confirmar accion";
   subtitulo.textContent = opciones.subtitulo || "Revisa antes de continuar";
   mensaje.textContent = opciones.mensaje || "";
+  icono.setAttribute("data-lucide", opciones.icono || "shield-alert");
   btnCancelar.textContent = opciones.cancelar || "Cancelar";
+  btnAlternativa.textContent = opciones.alternativa || "";
+  btnAlternativa.classList.toggle("hidden", !opciones.alternativa);
   btnAceptar.textContent = opciones.aceptar || "Aceptar";
   btnAceptar.classList.toggle("danger-button", opciones.peligro === true);
 
@@ -288,14 +295,20 @@ function renderizarGrilla() {
           const hist = obtenerHistorialCliente(turno.telefono);
           let statusClass = turno.falto
             ? "status-absence"
-            : turno.sena > 0
-              ? "status-paid"
-              : "status-unpaid";
+            : turno.torneo
+              ? "status-tournament"
+              : turno.sena > 0
+                ? "status-paid"
+                : "status-unpaid";
           const fechaReserva = obtenerFechaTurnoLabel(
             turno.fechaSemanaRefActual || turno.fechaSemanaRef || semanaId,
             turno.dia,
           );
-          const tipoTurno = turno.fijo ? "Fijo" : "Unico";
+          const tipoTurno = turno.torneo
+            ? "Torneo"
+            : turno.fijo
+              ? "Fijo"
+              : "Unico";
 
           celdaDia.setAttribute("data-dia", dia);
           celdaDia.setAttribute("data-hora", horaFormateada);
@@ -304,23 +317,23 @@ function renderizarGrilla() {
           celdaDia.innerHTML = `
                         <div class="appointment-name">
                             <span>${turno.nombre}</span>
-                            ${turno.fijo ? `<i data-lucide="pin"></i>` : ""}
+                            ${turno.torneo ? `<i data-lucide="trophy"></i>` : turno.fijo ? `<i data-lucide="pin"></i>` : ""}
                         </div>
                         <div class="appointment-phone">
                             <span>Tel: ${turno.telefono}</span>
                         </div>
                         <div class="appointment-meta">
                             <span>${fechaReserva}</span>
-                            <strong>${tipoTurno}</strong>
+                            <strong class="${turno.torneo ? "tournament-badge" : ""}">${tipoTurno}</strong>
                         </div>
                         <div class="appointment-history">
                             <span>Jugó: ${hist.jugo}</span>
                             <span>Faltó: ${hist.falto}</span>
                         </div>
-                        <div class="appointment-footer">
+                        ${turno.torneo ? "" : `<div class="appointment-footer">
                             <span>$${(turno.sena || 0).toLocaleString("es-AR")}</span>
                             <span class="appointment-badge">${turno.falto ? "FALTÓ" : turno.sena > 0 ? "SEÑA" : "S/SEÑA"}</span>
-                        </div>
+                        </div>`}
                     `;
         } else {
           celdaDia.setAttribute("data-dia", dia);
@@ -350,8 +363,8 @@ function actualizarEstadisticas() {
         const t = obtenerTurnoEn(dia, `${hStr}:${bl}`, semanaId);
         if (t) {
           if (t.falto) faltaron++;
-          else if (t.sena > 0) conSena++;
-          else sinSena++;
+          else if (!t.torneo && t.sena > 0) conSena++;
+          else if (!t.torneo) sinSena++;
         }
       });
     }

@@ -27,6 +27,8 @@ function abrirAgendarNuevo(dia, hora) {
   document.getElementById("inputTelefono").value = "";
   document.getElementById("inputSena").value = 0;
   document.getElementById("inputFijo").checked = false;
+  document.getElementById("inputTorneo").checked = false;
+  actualizarFormularioTorneo();
   document.getElementById("alertaInasistencia").className = "hidden";
   document.getElementById("btnEliminar").classList.add("hidden");
   document.getElementById("modalTurno").classList.remove("hidden");
@@ -42,6 +44,20 @@ function cerrarModalTurno() {
   document.getElementById("modalTurno").classList.add("hidden");
 }
 
+function actualizarFormularioTorneo() {
+  const esTorneo = document.getElementById("inputTorneo")?.checked;
+  const campoSena = document.getElementById("campoSena");
+  const configuracion = document.getElementById("grupoConfiguracion");
+  const inputSena = document.getElementById("inputSena");
+
+  if (campoSena) campoSena.classList.toggle("hidden", esTorneo);
+  if (configuracion) configuracion.classList.toggle("tournament-mode", esTorneo);
+  if (inputSena) {
+    inputSena.disabled = esTorneo;
+    if (esTorneo) inputSena.value = 0;
+  }
+}
+
 function guardarTurno(e) {
   // Guarda un turno nuevo o actualiza uno existente desde el formulario.
   e.preventDefault();
@@ -50,21 +66,44 @@ function guardarTurno(e) {
   const hora = document.getElementById("inputHora").value;
   const nombre = document.getElementById("inputNombre").value.trim();
   const telefono = document.getElementById("inputTelefono").value.trim();
-  const sena = parseFloat(document.getElementById("inputSena").value) || 0;
+  const torneo = document.getElementById("inputTorneo").checked;
+  const sena = torneo
+    ? 0
+    : parseFloat(document.getElementById("inputSena").value) || 0;
   const fijo = document.getElementById("inputFijo").checked;
   const semanaId = formatearFechaID(fechaLunesActual);
+  if (fijo) {
+    const conflicto = buscarConflictoFijo(dia, hora, semanaId, id || null);
+    if (conflicto) {
+      showToast(
+        "No se puede guardar: ese horario se cruza con un turno fijo o una reserva futura.",
+      );
+      return;
+    }
+  } else {
+    const ocupado = obtenerTurnoEn(dia, hora, semanaId);
+    if (ocupado && ocupado.id !== id) {
+      showToast("Error: Casillero ocupado.");
+      return;
+    }
+  }
 
   if (id) {
     const idx = turnos.findIndex((t) => t.id === id);
     if (idx !== -1) {
-      turnos[idx] = { ...turnos[idx], nombre, telefono, sena, fijo, dia, hora };
+      turnos[idx] = {
+        ...turnos[idx],
+        nombre,
+        telefono,
+        sena,
+        fijo,
+        torneo,
+        dia,
+        hora,
+      };
       showToast("Turno editado correctamente.");
     }
   } else {
-    if (obtenerTurnoEn(dia, hora, semanaId)) {
-      showToast("Error: Casillero ocupado.");
-      return;
-    }
     asegurarRegistroCliente(telefono, nombre, 1, 0);
     turnos.push({
       id: "turno-" + Date.now(),
@@ -72,6 +111,7 @@ function guardarTurno(e) {
       telefono,
       sena,
       fijo,
+      torneo,
       falto: false,
       dia,
       hora,
@@ -91,8 +131,17 @@ function abrirOpcionesTurno(turno) {
   idTurnoSeleccionado = turno.id;
   document.getElementById("opcionesCliente").textContent = turno.nombre;
   document.getElementById("txtInfoTelefono").textContent = turno.telefono;
-  document.getElementById("txtInfoSena").textContent = `$ ${turno.sena}`;
+  document.getElementById("labelInfoSena").textContent = turno.torneo
+    ? "Tipo de turno:"
+    : "Sena actual de este turno:";
+  document.getElementById("txtInfoSena").textContent = turno.torneo
+    ? "Torneo"
+    : `$ ${turno.sena}`;
   document.getElementById("inputSenaTraspaso").value = turno.sena;
+  document.getElementById("transferBox").classList.toggle(
+    "hidden",
+    turno.torneo === true,
+  );
 
   const hist = obtenerHistorialCliente(turno.telefono);
   document.getElementById("historialJugo").textContent = `${hist.jugo} veces`;
@@ -190,8 +239,9 @@ function ejecutarMoverPagado() {
     document.getElementById("selectReagendaDia").value,
   );
   const horaDestino = document.getElementById("selectReagendaHora").value;
-  const senaDestino =
-    parseFloat(document.getElementById("inputSenaTraspaso").value) || 0;
+  const senaDestino = turnoOrigen.torneo
+    ? 0
+    : parseFloat(document.getElementById("inputSenaTraspaso").value) || 0;
 
   if (
     semanaDestino === semanaIdActual &&
@@ -223,6 +273,7 @@ function ejecutarMoverPagado() {
     telefono: turnoOrigen.telefono,
     sena: senaDestino,
     fijo: false,
+    torneo: turnoOrigen.torneo === true,
     falto: false,
     dia: diaDestino,
     hora: horaDestino,
@@ -240,7 +291,7 @@ function ejecutarMoverPagado() {
   showToast(`¡Turno copiado a la fecha elegida con $${senaDestino} de seña!`);
 }
 
-function eliminarDesdeOpciones() {
+function eliminarDesdeOpcionesAnterior() {
   // Elimina un turno o anula solo una semana de un turno fijo según el contexto.
   const semanaIdActual = formatearFechaID(fechaLunesActual);
   let turno = turnos.find((t) => t.id === idTurnoSeleccionado);
@@ -323,19 +374,21 @@ function abrirEditarDesdeOpciones() {
     document.getElementById("inputTelefono").value = t.telefono;
     document.getElementById("inputSena").value = t.sena;
     document.getElementById("inputFijo").checked = t.fijo;
+    document.getElementById("inputTorneo").checked = t.torneo === true;
+    actualizarFormularioTorneo();
     document.getElementById("btnEliminar").classList.remove("hidden");
     document.getElementById("modalTurno").classList.remove("hidden");
     actualizarAlertaHistorial();
   }
 }
 
-function eliminarTurnoActual() {
+function eliminarTurnoActualAnterior() {
   // Wrapper simple para eliminar desde el formulario de edición.
   eliminarDesdeOpciones();
   cerrarModalTurno();
 }
 
-function limpiarTodo() {
+function limpiarTodoAnterior() {
   // Resetea toda la base local de la aplicación.
   if (confirm("¿Borrar toda la base de datos local?")) {
     turnos = [];
@@ -344,4 +397,98 @@ function limpiarTodo() {
     renderizarGrilla();
     actualizarEstadisticas();
   }
+}
+
+async function eliminarDesdeOpciones() {
+  const semanaIdActual = formatearFechaID(fechaLunesActual);
+  let turno = turnos.find((t) => t.id === idTurnoSeleccionado);
+
+  if (!turno) {
+    const dia = parseInt(document.getElementById("selectReagendaDia")?.value);
+    const hora = document.getElementById("selectReagendaHora")?.value;
+    const turnoVisible = obtenerTurnoEn(dia, hora, semanaIdActual);
+    if (turnoVisible?.replicaFijo) {
+      turno = turnos.find((t) => t.id === turnoVisible.id);
+    }
+  }
+
+  if (!turno) {
+    showToast("No se pudo identificar el turno.");
+    return false;
+  }
+
+  if (turno.fijo) {
+    const accion = await abrirModalConfirmacion({
+      titulo: "Cancelar turno fijo",
+      subtitulo: "Elige como aplicar la cancelacion",
+      mensaje:
+        "Este turno se repite semanalmente. Puedes cancelar solo la semana visible o eliminarlo definitivamente.",
+      cancelar: "Volver",
+      alternativa: "Solo esta semana",
+      aceptar: "Eliminar todas",
+      icono: "calendar-x",
+      peligro: true,
+    });
+
+    if (accion === "alternativa") {
+      if (!turno.excepcionesCanceladas) turno.excepcionesCanceladas = [];
+      if (!turno.excepcionesCanceladas.includes(semanaIdActual)) {
+        turno.excepcionesCanceladas.push(semanaIdActual);
+      }
+      asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 0);
+      showToast("Cancelado solo para esta semana.");
+    } else if (accion === true) {
+      asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 0);
+      turnos = turnos.filter((t) => t.id !== turno.id);
+      showToast("Turno fijo eliminado.");
+    } else {
+      return false;
+    }
+  } else {
+    const confirmado = await abrirModalConfirmacion({
+      titulo: "Eliminar reserva",
+      subtitulo: "Esta accion no se puede deshacer",
+      mensaje: "Se eliminara el turno seleccionado del calendario.",
+      cancelar: "Conservar turno",
+      aceptar: "Eliminar reserva",
+      icono: "trash-2",
+      peligro: true,
+    });
+    if (!confirmado) return false;
+
+    asegurarRegistroCliente(turno.telefono, turno.nombre, -1, 0);
+    turnos = turnos.filter((t) => t.id !== turno.id);
+    showToast("Reserva eliminada.");
+  }
+
+  guardarDatos();
+  cerrarModalOpciones();
+  renderizarGrilla();
+  actualizarEstadisticas();
+  return true;
+}
+
+async function eliminarTurnoActual() {
+  const eliminado = await eliminarDesdeOpciones();
+  if (eliminado) cerrarModalTurno();
+}
+
+async function limpiarTodo() {
+  const confirmado = await abrirModalConfirmacion({
+    titulo: "Restablecer turnero",
+    subtitulo: "Se borraran los turnos y clientes guardados",
+    mensaje: "Esta accion elimina todos los datos locales y no se puede deshacer.",
+    cancelar: "Cancelar",
+    aceptar: "Borrar todo",
+    icono: "rotate-ccw",
+    peligro: true,
+  });
+  if (!confirmado) return;
+
+  turnos = [];
+  clientesDB = {};
+  guardarDatos();
+  renderizarGrilla();
+  actualizarEstadisticas();
+  showToast("Turnero restablecido.");
 }

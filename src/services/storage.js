@@ -73,6 +73,45 @@ function crearRegistroFaltaDeFijo(turnoFijo, fechaSemanaRef) {
   };
 }
 
+function sumarSemanaAId(fechaSemanaRef) {
+  const fecha = new Date(`${fechaSemanaRef}T12:00:00`);
+  fecha.setDate(fecha.getDate() + 7);
+  return formatearFechaID(fecha);
+}
+
+function turnoFijoSeSuperponeDesde(turno, fechaSemanaInicio) {
+  if (!turno.fijo) return turno.fechaSemanaRef >= fechaSemanaInicio;
+
+  let semana = turno.fechaSemanaRef > fechaSemanaInicio
+    ? turno.fechaSemanaRef
+    : fechaSemanaInicio;
+  const excepciones = turno.excepcionesCanceladas || [];
+
+  // Solo hay que revisar las semanas canceladas consecutivas: la siguiente libre se superpone.
+  for (let intento = 0; intento <= excepciones.length; intento++) {
+    if (
+      turno.fechaUltimaSemanaFijo &&
+      semana > turno.fechaUltimaSemanaFijo
+    ) {
+      return false;
+    }
+    if (turnoFijoActivoEnSemana(turno, semana)) return true;
+    semana = sumarSemanaAId(semana);
+  }
+
+  return false;
+}
+
+function buscarConflictoFijo(dia, hora, fechaSemanaInicio, idExcluido = null) {
+  return turnos.find(
+    (turno) =>
+      turno.id !== idExcluido &&
+      turno.dia === dia &&
+      turno.hora === hora &&
+      turnoFijoSeSuperponeDesde(turno, fechaSemanaInicio),
+  );
+}
+
 function obtenerHistorialCliente(telefono) {
   // Devuelve el historial acumulado de jugadas y faltas para un cliente.
   const telLimpio = String(telefono || "")

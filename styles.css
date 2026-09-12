@@ -652,6 +652,12 @@ svg {
   color: #881337;
 }
 
+.status-tournament {
+  background: #ecfeff;
+  border-color: #67e8f9;
+  color: #155e75;
+}
+
 .appointment-name,
 .appointment-phone,
 .appointment-meta,
@@ -722,6 +728,11 @@ svg {
   color: var(--indigo-dark);
   font-size: 8px;
   text-transform: uppercase;
+}
+
+.appointment-meta strong.tournament-badge {
+  background: #cffafe;
+  color: #0e7490;
 }
 
 .appointment-history {
@@ -1164,10 +1175,19 @@ select:focus {
   font-weight: 850;
 }
 
-.fixed-toggle-wrap {
+.fixed-toggle-wrap,
+.turno-toggles {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+}
+
+.turno-toggles {
+  gap: 2px;
+}
+
+.tournament-mode {
+  grid-template-columns: 1fr;
 }
 
 .toggle-label {
@@ -1226,6 +1246,14 @@ select:focus {
 
 .toggle-label input:checked + .toggle-ui::after {
   transform: translateX(20px);
+}
+
+.tournament-toggle input:checked + .toggle-ui {
+  background: #0891b2;
+  border-color: #0e7490;
+  box-shadow:
+    inset 0 1px 3px rgba(8, 47, 73, 0.18),
+    0 0 0 3px rgba(8, 145, 178, 0.13);
 }
 
 .history-alert {
@@ -1455,6 +1483,87 @@ select:focus {
 
 .transfer-button:hover {
   background: #065f46;
+}
+
+.confirm-card {
+  max-width: 480px;
+  border: 1px solid #fecdd3;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.confirm-header {
+  padding: 20px 22px;
+  background: #fff1f2;
+  border-bottom: 1px solid #fecdd3;
+}
+
+.confirm-header h3 {
+  color: #881337;
+}
+
+.confirm-header p {
+  color: #9f1239;
+}
+
+.confirm-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.confirm-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.confirm-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.confirm-header .modal-close {
+  color: #9f1239;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.confirm-header .modal-close:hover {
+  color: #881337;
+  background: #ffffff;
+}
+
+.confirm-body {
+  padding: 22px 22px 20px;
+  background: #ffffff;
+}
+
+.confirm-body p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.danger-button {
+  background: #e11d48;
+  box-shadow: 0 8px 18px rgba(225, 29, 72, 0.22);
+}
+
+.danger-button:hover {
+  background: #be123c;
 }
 
 .toast {
